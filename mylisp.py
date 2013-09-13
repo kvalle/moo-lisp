@@ -59,22 +59,28 @@ def atomize(elem):
 ## Evaluating
 ##
 
-def evaluate(expr, env={}):
-    if isinstance(expr, str):
+def evaluate(ast, env={}):
+    if isinstance(ast, str):
         try:
-            return env[expr]
+            return env[ast]
         except KeyError:
-            raise LispNamingError("Variable '%s' is undefined" % expr)
-    elif not isinstance(expr, list):
-        return expr
-    elif expr[0] == 'if':
-        try:
-            (_, pred, then_exp, else_exp) = expr
-            return evaluate((then_exp if evaluate(pred, env) else else_exp), env)
-        except ValueError:
-            raise LispSyntaxError("Malformed if-statement: %s" % to_string(expr))
+            raise LispNamingError("Variable '%s' is undefined" % ast)
+    elif not isinstance(ast, list):
+        return ast
+    elif ast[0] == 'if': 
+        assert_exp_length(ast, 4, "if")
+        (_, pred, then_exp, else_exp) = ast
+        return evaluate((then_exp if evaluate(pred, env) else else_exp), env)
+    elif ast[0] == 'define': 
+        assert_exp_length(ast, 3, "define")
+        (_, variable, expression) = ast
+        env[variable] = evaluate(expression, env)
     else:
         raise Exception("something is missing")
+
+def assert_exp_length(ast, length, name):
+    if len(ast) != length:
+        raise LispSyntaxError("Malformed %s: %s" % (name, to_string(ast)))
 
 ##
 ## Lisp interpreter

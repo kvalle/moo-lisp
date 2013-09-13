@@ -28,3 +28,9 @@ class TestEval:
         ast = ["if", "pred", "then", "else"]
         env = {"pred": False, "else": 42}
         assert_equals(42, evaluate(ast, env))
+
+    def test_define(self):
+        ast = ["define", "x", 1000]
+        env = {}
+        evaluate(ast, env)
+        assert_equals(1000, env["x"])
