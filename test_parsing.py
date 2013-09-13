@@ -10,28 +10,33 @@ class TestParsing:
         self.lisp = mylisp.Lisp()
 
     def test_tokenize_single_atom(self):
-        assert_equals(["foo"], tokenize("foo"))
+        assert_equals(['foo'], tokenize('foo'))
 
     def test_tokenize_list(self):
-        source = "(foo 1 2)"
-        tokens = ["(", "foo", "1", "2", ")"]
+        source = '(foo 1 2)'
+        tokens = ['(', 'foo', '1', '2', ')']
         assert_equals(tokens, tokenize(source))
 
     def test_parse_on_simple_list(self):
-        program = "(foo bar)"
-        assert_equals(["foo", "bar"], parse(program))
+        program = '(foo bar)'
+        assert_equals(['foo', 'bar'], parse(program))
 
     def test_parse_on_tested_list(self):
-        program = "(foo (bar x y) (baz x))"
-        ast = ["foo", 
-                ["bar", "x", "y"], 
-                ["baz", "x"]]
+        program = '(foo (bar x y) (baz x))'
+        ast = ['foo', 
+                ['bar', 'x', 'y'], 
+                ['baz', 'x']]
         assert_equals(ast, parse(program))
 
     def test_parse_exception_missing_paren(self):
-        with assert_raises_regexp(LispSyntaxError, "Unexpected EOF"):
-            parse("(foo (bar x y)")
+        with assert_raises_regexp(LispSyntaxError, 'Unexpected EOF'):
+            parse('(foo (bar x y)')
 
     def test_parse_exception_extra_paren(self):
-        with assert_raises_regexp(LispSyntaxError, "Expected EOF"):
-            parse("(foo (bar x y)))")
+        with assert_raises_regexp(LispSyntaxError, 'Expected EOF'):
+            parse('(foo (bar x y)))')
+
+    def test_parse_with_types(self):
+        program = '(if #f (* 42 x) 100)'
+        ast = ['if', False, ['*', 42, 'x'], 100]
+        assert_equals(ast, parse(program))

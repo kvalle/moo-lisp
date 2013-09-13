@@ -8,13 +8,10 @@ def tokenize(source):
     return source.replace("(", " ( ").replace(")", " ) ").split()
 
 def analyze(tokens):
-    return atomize(treeify(tokens))
-
-def treeify(tokens):
-    exp, rest = read_elem(tokens)
+    sexp, rest = read_elem(tokens)
     if len(rest) > 0:
         raise LispSyntaxError("Expected EOF got '%s'" % " ".join(rest))
-    return exp
+    return sexp
 
 def read_elem(tokens):
     if len(tokens) == 0:
@@ -22,7 +19,8 @@ def read_elem(tokens):
     if tokens[0] == "(":
         return read_list(tokens[1:])
     else:
-        return (tokens[0], tokens[1:])
+        atom = atomize(tokens[0])
+        return (atom, tokens[1:])
 
 def read_list(tokens):
     res = []
@@ -33,9 +31,15 @@ def read_list(tokens):
         res.append(el)
     return res, tokens
 
-def atomize(ast):
-    "TODO"
-    return ast
+def atomize(elem):
+    if elem == "#f":
+        return False
+    elif elem == "#t":
+        return True
+    elif elem.isdigit():
+        return int(elem)
+    else: 
+        return elem # symbols or lists
 
 class Lisp:
     def interpret(self, source):
