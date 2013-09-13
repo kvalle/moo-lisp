@@ -1,7 +1,7 @@
 from nose.tools import assert_equals, assert_raises_regexp
 
 from mylisp import evaluate
-from mylisp import LispNamingError
+from mylisp import LispNamingError, LispSyntaxError
 
 class TestEval:
 
@@ -29,8 +29,16 @@ class TestEval:
         env = {"pred": False, "else": 42}
         assert_equals(42, evaluate(ast, env))
 
+    def test_wrong_if_syntax(self):
+        with assert_raises_regexp(LispSyntaxError, "Malformed if"):
+            evaluate(["if", "with", "far", "too", "many", "parts"])
+
     def test_define(self):
         ast = ["define", "x", 1000]
         env = {}
         evaluate(ast, env)
         assert_equals(1000, env["x"])
+
+    def test_wrong_define_syntax(self):
+        with assert_raises_regexp(LispSyntaxError, "Malformed define"):
+            evaluate(["define", "x"])
