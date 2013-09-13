@@ -2,6 +2,7 @@ from unittest.case import SkipTest
 from nose.tools import eq_
 
 import mylisp
+from mylisp import tokenize
 
 class TestMyLisp:
 
@@ -19,3 +20,11 @@ class TestMyLisp:
         """
         self.lisp.interpret(program)
         eq_(120, self.lisp.interpret("(fact 5)"))
+
+    def test_tokenize_single_atom(self):
+        eq_(["foo"], tokenize("foo"))
+
+    def test_tokenize_list(self):
+        source = "(foo 1 2)"
+        tokens = ["(", "foo", "1", "2", ")"]
+        eq_(tokens, tokenize(source))
