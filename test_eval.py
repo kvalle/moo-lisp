@@ -19,3 +19,12 @@ class TestEval:
     def test_eval_boolean(self):
         assert_equals(True, evaluate(True))
         assert_equals(False, evaluate(False))
+
+    def test_simple_if_statement(self):
+        ast = ["if", True, 42, 1000]
+        assert_equals(42, evaluate(ast))
+
+    def test_if_with_variable_lookup(self):
+        ast = ["if", "pred", "then", "else"]
+        env = {"pred": False, "else": 42}
+        assert_equals(42, evaluate(ast, env))

@@ -3,6 +3,14 @@ class LispSyntaxError(SyntaxError):
 class LispNamingError(LookupError): 
     pass
 
+def to_string(ast):
+    if isinstance(ast, list):
+        return "(%s)" % " ".join([to_string(x) for x in ast])
+    elif isinstance(ast, bool):
+        return "#t" if ast else "#f"
+    else:
+        return str(ast)
+
 ##
 ## Parsing
 ##
@@ -16,7 +24,7 @@ def tokenize(source):
 def analyze(tokens):
     sexp, rest = read_elem(tokens)
     if len(rest) > 0:
-        raise LispSyntaxError("Expected EOF got '%s'" % " ".join(rest))
+        raise LispSyntaxError("Expected EOF got '%s'" % to_string(rest))
     return sexp
 
 def read_elem(tokens):
@@ -59,6 +67,12 @@ def evaluate(expr, env={}):
             raise LispNamingError("Variable '%s' is undefined" % expr)
     elif not isinstance(expr, list):
         return expr
+    elif expr[0] == 'if':
+        try:
+            (_, pred, then_exp, else_exp) = expr
+            return evaluate((then_exp if evaluate(pred, env) else else_exp), env)
+        except ValueError:
+            raise LispSyntaxError("Malformed if-statement: %s" % to_string(expr))
     else:
         raise Exception("something is missing")
 
