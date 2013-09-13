@@ -1,6 +1,5 @@
 from nose.tools import assert_equals, assert_raises_regexp
 
-import mylisp
 from mylisp import evaluate
 from mylisp import LispNamingError
 
@@ -13,3 +12,10 @@ class TestEval:
     def test_lookup_missing_variable(self):
         with assert_raises_regexp(LispNamingError, "my-var"):
             evaluate("my-var", {})
+
+    def test_eval_integer(self):
+        assert_equals(42, evaluate(42))
+
+    def test_eval_boolean(self):
+        assert_equals(True, evaluate(True))
+        assert_equals(False, evaluate(False))

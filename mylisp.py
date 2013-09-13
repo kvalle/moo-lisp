@@ -45,7 +45,7 @@ def atomize(elem):
     elif elem.isdigit():
         return int(elem)
     else: 
-        return elem # symbols or lists
+        return elem  # symbols or lists
 
 ##
 ## Evaluating
@@ -57,6 +57,8 @@ def evaluate(expr, env={}):
             return env[expr]
         except KeyError:
             raise LispNamingError("Variable '%s' is undefined" % expr)
+    elif not isinstance(expr, list):
+        return expr
     else:
         raise Exception("something is missing")
 
