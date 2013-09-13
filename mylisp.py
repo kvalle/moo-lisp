@@ -1,3 +1,6 @@
+class LispSyntaxError(SyntaxError): 
+    pass
+
 def parse(source):
     return analyze(tokenize(source))
 
@@ -8,10 +11,14 @@ def analyze(tokens):
     return atomize(treeify(tokens))
 
 def treeify(tokens):
-    exp, _ = read_elem(tokens)
+    exp, rest = read_elem(tokens)
+    if len(rest) > 0:
+        raise LispSyntaxError("Expected EOF got '%s'" % " ".join(rest))
     return exp
 
 def read_elem(tokens):
+    if len(tokens) == 0:
+        raise LispSyntaxError("Unexpected EOF")
     if tokens[0] == "(":
         return read_list(tokens[1:])
     else:
@@ -21,7 +28,8 @@ def read_list(tokens):
     res = []
     while True:
         el, tokens = read_elem(tokens)
-        if el == ")": break
+        if el == ")": 
+            break
         res.append(el)
     return res, tokens
 

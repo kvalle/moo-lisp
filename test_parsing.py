@@ -1,8 +1,8 @@
-from unittest.case import SkipTest
-from nose.tools import eq_
+from nose.tools import assert_equals, assert_raises_regexp
 
 import mylisp
 from mylisp import tokenize, parse
+from mylisp import LispSyntaxError
 
 class TestParsing:
 
@@ -10,18 +10,28 @@ class TestParsing:
         self.lisp = mylisp.Lisp()
 
     def test_tokenize_single_atom(self):
-        eq_(["foo"], tokenize("foo"))
+        assert_equals(["foo"], tokenize("foo"))
 
     def test_tokenize_list(self):
         source = "(foo 1 2)"
         tokens = ["(", "foo", "1", "2", ")"]
-        eq_(tokens, tokenize(source))
+        assert_equals(tokens, tokenize(source))
 
     def test_parse_on_simple_list(self):
         program = "(foo bar)"
-        eq_(["foo", "bar"], parse(program))
+        assert_equals(["foo", "bar"], parse(program))
 
     def test_parse_on_tested_list(self):
         program = "(foo (bar x y) (baz x))"
-        ast = ["foo", ["bar", "x", "y"], ["baz", "x"]]
-        eq_(ast, parse(program))
+        ast = ["foo", 
+                ["bar", "x", "y"], 
+                ["baz", "x"]]
+        assert_equals(ast, parse(program))
+
+    def test_parse_exception_missing_paren(self):
+        with assert_raises_regexp(LispSyntaxError, "Unexpected EOF"):
+            parse("(foo (bar x y)")
+
+    def test_parse_exception_extra_paren(self):
+        with assert_raises_regexp(LispSyntaxError, "Expected EOF"):
+            parse("(foo (bar x y)))")
