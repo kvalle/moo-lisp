@@ -1,13 +1,9 @@
 from nose.tools import assert_equals, assert_raises_regexp
 
-import mylisp
 from mylisp import tokenize, parse
 from mylisp import LispSyntaxError
 
 class TestParsing:
-
-    def setup(self):
-        self.lisp = mylisp.Lisp()
 
     def test_tokenize_single_atom(self):
         assert_equals(['foo'], tokenize('foo'))

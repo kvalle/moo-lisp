@@ -1,5 +1,11 @@
 class LispSyntaxError(SyntaxError): 
     pass
+class LispNamingError(LookupError): 
+    pass
+
+##
+## Parsing
+##
 
 def parse(source):
     return analyze(tokenize(source))
@@ -40,6 +46,23 @@ def atomize(elem):
         return int(elem)
     else: 
         return elem # symbols or lists
+
+##
+## Evaluating
+##
+
+def evaluate(expr, env={}):
+    if isinstance(expr, str):
+        try:
+            return env[expr]
+        except KeyError:
+            raise LispNamingError("Variable '%s' is undefined" % expr)
+    else:
+        raise Exception("something is missing")
+
+##
+## Lisp interpreter
+##
 
 class Lisp:
     def interpret(self, source):
