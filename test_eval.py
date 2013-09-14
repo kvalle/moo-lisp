@@ -51,6 +51,18 @@ class TestEval:
         fn = evaluate(ast, Environment())
         assert_equals(42, fn())
 
+    def test_defining_lambda_with_error(self):
+        """Tests that the lambda body is not being evaluated when the lambda
+        is evaluated or defined. (It should first be evaluated when the function
+        is later invoced.)"""
+    
+        ast = parse("""
+            (define fn-with-error
+                (lambda (x y)
+                    (function body that would never work)))
+        """)
+        evaluate(ast, Environment())
+
     def test_lambda_with_free_var(self):
         """Tests that the lambda have access to variables 
         from the environment in which it was defined"""
