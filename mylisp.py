@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import cmd
+import cmd, sys
 
 class LispError(Exception): 
     pass
@@ -162,4 +162,9 @@ class REPL(cmd.Cmd, object):
         super(REPL, self).postloop()
 
 if __name__ == '__main__':
-    REPL().cmdloop()
+    repl = REPL()
+    if sys.argv[1]:
+        for line in open(sys.argv[1], 'r'):
+            repl.onecmd(line)
+    else:
+        repl.cmdloop()
