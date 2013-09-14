@@ -109,6 +109,11 @@ def evaluate(ast, env):
         assert_exp_length(ast, 3, "lambda")
         (_, params, body) = ast
         return lambda *args: evaluate(body, Environment(zip(params, args), env))
+    elif ast[0] == 'begin':
+        if len(ast[1:]) == 0:
+            raise LispSyntaxError("begin cannot be empty: %s" % to_string(ast))
+        results = [evaluate(exp, env) for exp in ast[1:]]
+        return results[-1]
     else:
         fn = evaluate(ast[0], env)
         args = [evaluate(exp, env) for exp in ast[1:]]

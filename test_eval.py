@@ -122,3 +122,25 @@ class TestEval:
         """
         evaluate(parse(program), env)
         assert_equals(1000, evaluate(["fn", 10], env))
+
+    def test_begin_form(self):
+        """Testing evaluating expressions in sequence with the begin 
+        special form"""
+
+        env = Environment()
+        result = evaluate(parse("""
+            (begin 
+                (define foo 1)
+                (define bar 2)
+                foo)
+        """), env)
+
+        assert_equals(1, result)
+        assert_equals(Environment({"foo": 1, "bar": 2}), env)
+
+    def test_empty_begin(self):
+        """The begin form should throw a syntax error if there are
+        no expressions to be evaluated"""
+
+        with assert_raises_regexp(LispSyntaxError, "begin.*empty"):
+            evaluate(["begin"], Environment())
