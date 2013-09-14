@@ -158,15 +158,22 @@ class REPL(cmd.Cmd, object):
         return True
 
     def do_help(self, s):
-        print "This is the help/usage/documentation."
-        print "It's not quite written yet."
+        with open("README.txt", "r") as f:
+            for line in f:
+                print line,
 
     def preloop(self):
-        print "Hey-ho, welcome to the REPL!"
+        print """ 
+                          ^__^       
+          welcome to      (oo)\_______     
+         the MOO-lisp     (__)\       )\/\      
+             REPL             ||----w |         
+                              ||     ||      
+        """
         super(REPL, self).preloop()
 
     def postloop(self):
-        print '\nSo long!'
+        print '\nBye :)'
         super(REPL, self).postloop()
 
 if __name__ == '__main__':

@@ -1,8 +1,8 @@
 from nose.tools import assert_equals, assert_raises_regexp
 
-from mylisp import evaluate, parse
-from mylisp import LispNamingError, LispSyntaxError
-from mylisp import Environment
+from moolisp import evaluate, parse
+from moolisp import LispNamingError, LispSyntaxError
+from moolisp import Environment
 
 class TestEval:
 
