@@ -3,6 +3,7 @@
 
 import cmd
 import sys
+import re
 
 class LispError(Exception): 
     pass
@@ -27,7 +28,9 @@ def parse(source):
     return analyze(tokenize(source))
 
 def tokenize(source):
-    return source.replace("(", " ( ").replace(")", " ) ").split()
+    source = re.sub(r";.*\n", "\n", source)
+    source = source.replace("(", " ( ").replace(")", " ) ")
+    return source.split()
 
 def analyze(tokens):
     sexp, rest = read_elem(tokens)

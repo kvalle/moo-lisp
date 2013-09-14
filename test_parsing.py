@@ -36,3 +36,15 @@ class TestParsing:
         program = '(if #f (* 42 x) 100)'
         ast = ['if', False, ['*', 42, 'x'], 100]
         assert_equals(ast, parse(program))
+
+    def test_parse_comments(self):
+        program = """
+        ;; this first line is a comment
+        (define variable
+            ; here is another comment
+            (if #t 
+                42 ; inline comment!
+                (something else)))
+        """
+        expected_ast = ['define', 'variable', ['if', True, 42, ['something', 'else']]]
+        assert_equals(expected_ast, parse(program))
