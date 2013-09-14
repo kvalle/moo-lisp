@@ -4,6 +4,7 @@
 import cmd
 import sys
 import re
+import os
 
 class LispError(Exception): 
     pass
@@ -124,7 +125,7 @@ def assert_exp_length(ast, length, name):
         raise LispSyntaxError("Malformed %s: %s" % (name, to_string(ast)))
 
 ##
-## Main
+## Interpreter
 ##
 
 import operator as op
@@ -137,9 +138,44 @@ default_environment = Environment({
 def interpret(source, env=default_environment):
     return evaluate(parse(source), env)
 
+##
+## REPL
+##
+
+ATTRIBUTES = {
+    'bold': 1, 
+    'dark': 2
+}
+
+COLORS = {
+    'grey': 30,
+    'red': 31,
+    'green': 32,
+    'yellow': 33,
+    'blue': 34,
+    'magenta': 35,
+    'cyan': 36,
+    'white': 37
+}
+
+def colored(text, color, attr=None):
+    if os.getenv('ANSI_COLORS_DISABLED'):
+        return text
+
+    format = '\033[%dm'
+
+    color = format % COLORS[color]
+    attr = format % ATTRIBUTES[attr] if attr is not None else ""
+    reset = '\033[0m'
+
+    return color + attr + text + reset
+
+def grey(text):
+    return colored(text, "grey", attr='bold')
+
 class REPL(cmd.Cmd, object):
 
-    prompt = "→ "
+    prompt = colored("→  ", "grey")
 
     def emptyline(self):
         pass
@@ -151,7 +187,7 @@ class REPL(cmd.Cmd, object):
             if result is not None: 
                 print to_string(result)
         except LispError, e:
-            print "! %s" % e
+            print colored("! ", "red") + str(e)
 
     def do_EOF(self, s):
         "Exit REPL on ^D"
@@ -163,13 +199,13 @@ class REPL(cmd.Cmd, object):
                 print line,
 
     def preloop(self):
-        print """ 
-                          ^__^       
-          welcome to      (oo)\_______     
-         the MOO-lisp     (__)\       )\/\      
-             REPL             ||----w |         
-                              ||     ||      
-        """
+        print
+        print "                       " + grey("    ^__^             ")
+        print "          welcome to   " + grey("    (oo)\_______     ")
+        print "         the MOO-lisp  " + grey("    (__)\       )\/\ ")
+        print "             REPL      " + grey("        ||----w |    ")
+        print "                       " + grey("        ||     ||    ")
+        print
         super(REPL, self).preloop()
 
     def postloop(self):
