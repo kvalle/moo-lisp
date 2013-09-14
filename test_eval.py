@@ -15,15 +15,15 @@ class TestEval:
             evaluate("my-var", Environment())
 
     def test_eval_integer(self):
-        assert_equals(42, evaluate(42))
+        assert_equals(42, evaluate(42, Environment()))
 
     def test_eval_boolean(self):
-        assert_equals(True, evaluate(True))
-        assert_equals(False, evaluate(False))
+        assert_equals(True, evaluate(True, Environment()))
+        assert_equals(False, evaluate(False, Environment()))
 
     def test_simple_if_statement(self):
         ast = ["if", True, 42, 1000]
-        assert_equals(42, evaluate(ast))
+        assert_equals(42, evaluate(ast, Environment()))
 
     def test_if_with_variable_lookup(self):
         ast = ["if", "pred", "then", "else"]
@@ -32,7 +32,7 @@ class TestEval:
 
     def test_wrong_if_syntax(self):
         with assert_raises_regexp(LispSyntaxError, "Malformed if"):
-            evaluate(["if", "with", "far", "too", "many", "parts"])
+            evaluate(["if", "with", "far", "too", "many", "parts"], Environment())
 
     def test_define(self):
         ast = ["define", "x", 1000]
@@ -42,13 +42,13 @@ class TestEval:
 
     def test_wrong_define_syntax(self):
         with assert_raises_regexp(LispSyntaxError, "Malformed define"):
-            evaluate(["define", "x"])
+            evaluate(["define", "x"], Environment())
 
     def test_lambda_with_no_free_vars(self):
         "Tests that the lambda executes it's body when called"
         
         ast = ["lambda", [], 42]
-        fn = evaluate(ast)
+        fn = evaluate(ast, Environment())
         assert_equals(42, fn())
 
     def test_lambda_with_free_var(self):
@@ -87,7 +87,7 @@ class TestEval:
         """Tests that it's is possible to define a lambda function and
         then calling it directly"""
 
-        assert_equals(42, evaluate([["lambda", ["x"], "x"], 42]))
+        assert_equals(42, evaluate([["lambda", ["x"], "x"], 42], Environment()))
 
     def test_calling_function_recursively(self):
         """Tests that a named function is included in the environment

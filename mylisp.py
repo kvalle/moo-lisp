@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import cmd, sys
+import cmd
+import sys
 
 class LispError(Exception): 
     pass
@@ -88,9 +89,7 @@ class Environment(dict):
 ## Evaluating
 ##
 
-default_environment = Environment()
-
-def evaluate(ast, env=default_environment):
+def evaluate(ast, env):
     if isinstance(ast, str):
         return env[ast]
     elif not isinstance(ast, list):
@@ -117,20 +116,21 @@ def assert_exp_length(ast, length, name):
         raise LispSyntaxError("Malformed %s: %s" % (name, to_string(ast)))
 
 ##
-## Lisp interpreter
-##
-
-class Lisp:
-    def interpret(self, source):
-        raise NotImplementedError
-
-##
 ## Main
 ##
 
+import operator as op
+
+default_environment = Environment({
+    "*": op.mul, "-": op.sub, "+": op.add, "/": op.div,
+    '>':op.gt, '<':op.lt, '>=':op.ge, '<=':op.le, '=':op.eq, 'not':op.not_
+})
+
+def interpret(source, env=default_environment):
+    return evaluate(parse(source), env)
+
 class REPL(cmd.Cmd, object):
 
-    env = default_environment
     prompt = "→ "
 
     def emptyline(self):
@@ -139,7 +139,7 @@ class REPL(cmd.Cmd, object):
     def default(self, line):
         "Handle parsing of LISPy inputs"
         try:
-            result = evaluate(parse(line), self.env)
+            result = interpret(line)
             if result is not None: 
                 print to_string(result)
         except LispError, e:
@@ -163,7 +163,7 @@ class REPL(cmd.Cmd, object):
 
 if __name__ == '__main__':
     repl = REPL()
-    if sys.argv[1]:
+    if len(sys.argv) > 1:
         for line in open(sys.argv[1], 'r'):
             repl.onecmd(line)
     else:
