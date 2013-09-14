@@ -1,6 +1,13 @@
-class LispSyntaxError(SyntaxError): 
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import cmd
+
+class LispError(Exception): 
     pass
-class LispNamingError(LookupError): 
+class LispSyntaxError(SyntaxError, LispError): 
+    pass
+class LispNamingError(LookupError, LispError): 
     pass
 
 def to_string(ast):
@@ -116,3 +123,43 @@ def assert_exp_length(ast, length, name):
 class Lisp:
     def interpret(self, source):
         raise NotImplementedError
+
+##
+## Main
+##
+
+class REPL(cmd.Cmd, object):
+
+    env = default_environment
+    prompt = "→ "
+
+    def emptyline(self):
+        pass
+
+    def default(self, line):
+        "Handle parsing of LISPy inputs"
+        try:
+            result = evaluate(parse(line), self.env)
+            if result is not None: 
+                print to_string(result)
+        except LispError, e:
+            print "! %s" % e
+
+    def do_EOF(self, s):
+        "Exit REPL on ^D"
+        return True
+
+    def do_help(self, s):
+        print "This is the help/usage/documentation."
+        print "It's not quite written yet."
+
+    def preloop(self):
+        print "Hey-ho, welcome to the REPL!"
+        super(REPL, self).preloop()
+
+    def postloop(self):
+        print '\nSo long!'
+        super(REPL, self).postloop()
+
+if __name__ == '__main__':
+    REPL().cmdloop()

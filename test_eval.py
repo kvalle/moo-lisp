@@ -95,7 +95,10 @@ class TestEval:
 
         # Starting env out with some "standard functions" this time
         import operator
-        env = Environment({'-':operator.sub, '>':operator.gt})
+        env = Environment({
+            '-': operator.sub, 
+            '>': operator.gt
+        })
         
         # Meaningless (albeit recursive) function
         program = """
