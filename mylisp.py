@@ -123,7 +123,7 @@ import operator as op
 
 default_environment = Environment({
     "*": op.mul, "-": op.sub, "+": op.add, "/": op.div,
-    '>':op.gt, '<':op.lt, '>=':op.ge, '<=':op.le, '=':op.eq, 'not':op.not_
+    '>': op.gt, '<': op.lt, '>=': op.ge, '<=': op.le, '=': op.eq, 'not': op.not_
 })
 
 def interpret(source, env=default_environment):
