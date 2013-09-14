@@ -81,7 +81,9 @@ class Environment(dict):
 ## Evaluating
 ##
 
-def evaluate(ast, env={}):
+default_environment = Environment()
+
+def evaluate(ast, env=default_environment):
     if isinstance(ast, str):
         return env[ast]
     elif not isinstance(ast, list):
@@ -99,7 +101,9 @@ def evaluate(ast, env={}):
         (_, params, body) = ast
         return lambda *args: evaluate(body, Environment(zip(params, args), env))
     else:
-        raise Exception("Not implemented: %s" % ast)
+        fn = evaluate(ast[0], env)
+        args = [evaluate(exp, env) for exp in ast[1:]]
+        return fn(*args)
 
 def assert_exp_length(ast, length, name):
     if len(ast) != length:

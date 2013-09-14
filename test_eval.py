@@ -1,6 +1,6 @@
 from nose.tools import assert_equals, assert_raises_regexp
 
-from mylisp import evaluate
+from mylisp import evaluate, parse
 from mylisp import LispNamingError, LispSyntaxError
 from mylisp import Environment
 
@@ -59,10 +59,51 @@ class TestEval:
         fn = evaluate(ast, Environment({"free-variable": 100}))
         assert_equals(100, fn())
 
-    def test_lambda_with_free_var(self):
+    def test_lambda_with_argument(self):
         """Test that the arguments are included in the environment when 
         the function body is evaluated"""
 
         ast = ["lambda", ["x"], "x"]
         fn = evaluate(ast, Environment())
         assert_equals("foo", fn("foo"))
+
+    def test_defining_then_looking_up_function(self):
+        """Sanity check that we can hold and look up functions in the
+        environment"""
+
+        env = Environment()
+        evaluate(["define", "my-fn", ["lambda", ["x"], "x"]], env)
+        assert_equals("foo", env["my-fn"]("foo"))
+
+    def test_calling_simple_function(self):
+        """Test calling named function that's been previously defined 
+        from the environment"""
+
+        env = Environment()
+        evaluate(["define", "my-fn", ["lambda", ["x"], "x"]], env)
+        assert_equals(42, evaluate(["my-fn", 42], env))
+
+    def test_calling_lambda_directly(self):
+        """Tests that it's is possible to define a lambda function and
+        then calling it directly"""
+
+        assert_equals(42, evaluate([["lambda", ["x"], "x"], 42]))
+
+    def test_calling_function_recursively(self):
+        """Tests that a named function is included in the environment
+        where it is evaluated"""
+
+        # Starting env out with some "standard functions" this time
+        import operator
+        env = Environment({'-':operator.sub, '>':operator.gt})
+        
+        # Meaningless (albeit recursive) function
+        program = """
+            (define fn 
+                (lambda (x) 
+                    (if (> x 0) 
+                        (fn (- x 1))
+                        1000)))
+        """
+        evaluate(parse(program), env)
+        assert_equals(1000, evaluate(["fn", 10], env))
