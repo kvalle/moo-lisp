@@ -2,16 +2,17 @@ from nose.tools import assert_equals, assert_raises_regexp
 
 from mylisp import evaluate
 from mylisp import LispNamingError, LispSyntaxError
+from mylisp import Environment
 
 class TestEval:
 
     def test_simple_lookup_from_env(self):
-        env = {"foo": 42, "bar": True}
+        env = Environment({"foo": 42, "bar": True})
         assert_equals(42, evaluate("foo", env))
 
     def test_lookup_missing_variable(self):
         with assert_raises_regexp(LispNamingError, "my-var"):
-            evaluate("my-var", {})
+            evaluate("my-var", Environment())
 
     def test_eval_integer(self):
         assert_equals(42, evaluate(42))
@@ -26,7 +27,7 @@ class TestEval:
 
     def test_if_with_variable_lookup(self):
         ast = ["if", "pred", "then", "else"]
-        env = {"pred": False, "else": 42}
+        env = Environment({"pred": False, "else": 42})
         assert_equals(42, evaluate(ast, env))
 
     def test_wrong_if_syntax(self):
@@ -35,7 +36,7 @@ class TestEval:
 
     def test_define(self):
         ast = ["define", "x", 1000]
-        env = {}
+        env = Environment()
         evaluate(ast, env)
         assert_equals(1000, env["x"])
 

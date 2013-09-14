@@ -56,15 +56,34 @@ def atomize(elem):
         return elem  # symbols or lists
 
 ##
+## Environment
+##
+
+class Environment(dict):
+    def __init__(self, vars=None, outer=None):
+        self.outer = outer
+        if vars:
+            self.update(vars)
+
+    def __getitem__(self, key):
+        return self.defining_env(key).get(key)
+
+    def defining_env(self, variable):
+        "Find the innermost environment defining a variable"
+        if variable in self:
+            return self
+        elif self.outer is not None:
+            return self.outer.defining_env(variable)
+        else:
+            raise LispNamingError("Variable '%s' is undefined" % variable)
+
+##
 ## Evaluating
 ##
 
 def evaluate(ast, env={}):
     if isinstance(ast, str):
-        try:
-            return env[ast]
-        except KeyError:
-            raise LispNamingError("Variable '%s' is undefined" % ast)
+        return env[ast]
     elif not isinstance(ast, list):
         return ast
     elif ast[0] == 'if': 
@@ -76,7 +95,7 @@ def evaluate(ast, env={}):
         (_, variable, expression) = ast
         env[variable] = evaluate(expression, env)
     else:
-        raise Exception("something is missing")
+        raise Exception("Not implemented: %s" % ast)
 
 def assert_exp_length(ast, length, name):
     if len(ast) != length:
