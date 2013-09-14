@@ -43,3 +43,26 @@ class TestEval:
     def test_wrong_define_syntax(self):
         with assert_raises_regexp(LispSyntaxError, "Malformed define"):
             evaluate(["define", "x"])
+
+    def test_lambda_with_no_free_vars(self):
+        "Tests that the lambda executes it's body when called"
+        
+        ast = ["lambda", [], 42]
+        fn = evaluate(ast)
+        assert_equals(42, fn())
+
+    def test_lambda_with_free_var(self):
+        """Tests that the lambda have access to variables 
+        from the environment in which it was defined"""
+
+        ast = ["lambda", [], "free-variable"]
+        fn = evaluate(ast, Environment({"free-variable": 100}))
+        assert_equals(100, fn())
+
+    def test_lambda_with_free_var(self):
+        """Test that the arguments are included in the environment when 
+        the function body is evaluated"""
+
+        ast = ["lambda", ["x"], "x"]
+        fn = evaluate(ast, Environment())
+        assert_equals("foo", fn("foo"))

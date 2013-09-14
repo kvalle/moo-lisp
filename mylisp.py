@@ -94,6 +94,10 @@ def evaluate(ast, env={}):
         assert_exp_length(ast, 3, "define")
         (_, variable, expression) = ast
         env[variable] = evaluate(expression, env)
+    elif ast[0] == 'lambda':
+        assert_exp_length(ast, 3, "lambda")
+        (_, params, body) = ast
+        return lambda *args: evaluate(body, Environment(zip(params, args), env))
     else:
         raise Exception("Not implemented: %s" % ast)
 
