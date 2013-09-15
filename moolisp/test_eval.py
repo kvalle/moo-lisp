@@ -144,3 +144,9 @@ class TestEval:
 
         with assert_raises_regexp(LispSyntaxError, "begin.*empty"):
             evaluate(["begin"], Environment())
+
+    def test_quote(self):
+        """Quoting returns the expression being quoted without evaluating it."""
+
+        ast = ["quote", ["foo", ["+", 1, 2], ["*", 4, 10]]]
+        assert_equals(ast[1], evaluate(ast, Environment()))

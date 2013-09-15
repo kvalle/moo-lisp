@@ -87,6 +87,10 @@ def evaluate(ast, env):
             raise LispSyntaxError("begin cannot be empty: %s" % to_string(ast))
         results = [evaluate(exp, env) for exp in ast[1:]]
         return results[-1]
+    elif ast[0] == 'quote':
+        _assert_exp_length(ast, 2, "quote")
+        (_, exp) = ast
+        return exp
     else:
         fn = evaluate(ast[0], env)
         args = [evaluate(exp, env) for exp in ast[1:]]
