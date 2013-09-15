@@ -5,7 +5,7 @@ import copy
 from errors import LispError
 from colors import colored, grey
 from env import default_environment
-from interpreter import interpret, to_string
+from interpreter import interpret, to_string, preprocess
 
 # importing this gives readline goodness when running on systems
 # where it is supported (i.e. UNIX-y systems)
@@ -40,17 +40,18 @@ def read_expression():
 
     exp = ""
     open_parens = 0
-    line, parens = read_line("→  ")
-    open_parens += parens
-    exp += line
-    while open_parens > 0:
-        line, parens = read_line("…  ")
+    while True:
+        line, parens = read_line("→  " if not exp.strip() else "…  ")
         open_parens += parens
         exp += line
+        if exp.strip() and open_parens <= 0:
+            break
+
     return exp
 
 def read_line(prompt):
     "Return touple of user input line and number of unclosed parens"
 
     line = raw_input(colored(prompt, "grey", "bold"))
+    line = preprocess(line + "\n")
     return (line, line.count("(") - line.count(")"))
