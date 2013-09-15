@@ -27,9 +27,13 @@ def repl():
         while True:
             try:
                 source = read_expression()
-                result = interpret(source, env)
-                if result is not None: 
-                    print to_string(result)
+                if source.strip() == "(help)":
+                    with open('moolisp/usage.txt', 'r') as f:
+                        print "".join(f.readlines())
+                else:
+                    result = interpret(source, env)
+                    if result is not None: 
+                        print to_string(result)
             except LispError, e:
                 print colored("! ", "red") + str(e)
     except (EOFError, KeyboardInterrupt):
