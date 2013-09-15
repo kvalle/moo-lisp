@@ -4,12 +4,15 @@ import cmd
 
 from errors import LispError
 from colors import colored, grey
+from env import default_environment
 from interpreter import interpret, to_string
 
 def repl():
+    "Start the interactive Read-Eval-Print-Loop"
     REPL().cmdloop()
 
 def parse_file(filename):
+    "Interpret a .moo source file"
     repl = REPL()
     for line in open(filename, 'r'):
         repl.onecmd(line)
@@ -17,6 +20,7 @@ def parse_file(filename):
 class REPL(cmd.Cmd, object):
 
     prompt = colored("→  ", "grey")
+    env = default_environment
 
     def emptyline(self):
         pass
@@ -24,7 +28,7 @@ class REPL(cmd.Cmd, object):
     def default(self, line):
         "Handle parsing of LISPy inputs"
         try:
-            result = interpret(line)
+            result = interpret(line, self.env)
             if result is not None: 
                 print to_string(result)
         except LispError, e:
@@ -50,5 +54,5 @@ class REPL(cmd.Cmd, object):
         super(REPL, self).preloop()
 
     def postloop(self):
-        print grey('\nBye :)')
+        print grey('\nBye! o/')
         super(REPL, self).postloop()
