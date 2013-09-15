@@ -11,12 +11,6 @@ def repl():
     "Start the interactive Read-Eval-Print-Loop"
     REPL().cmdloop()
 
-def parse_file(filename):
-    "Interpret a .moo source file"
-    repl = REPL()
-    for line in open(filename, 'r'):
-        repl.onecmd(line)
-
 class REPL(cmd.Cmd, object):
 
     prompt = colored("→  ", "grey")
