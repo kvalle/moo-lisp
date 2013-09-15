@@ -2,6 +2,7 @@
 
 __all__ = ['repl', 'parse_file', 'interpret', 'tokenize', 'parse', 'evaluate']
 
+import sys
 from interpreter import interpret, tokenize, parse, evaluate
 from repl import repl
 from env import default_environment
@@ -15,3 +16,4 @@ def parse_file(filename):
             print interpret(source, default_environment)
     except LispError, e:
         print e
+        sys.exit(1)
