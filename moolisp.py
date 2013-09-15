@@ -26,10 +26,12 @@ def to_string(ast):
 ##
 
 def parse(source):
-    return analyze(tokenize(source))
+    return analyze(tokenize(preprocess(source)))
+
+def preprocess(source):
+    return re.sub(r";.*\n", "\n", source)
 
 def tokenize(source):
-    source = re.sub(r";.*\n", "\n", source)
     source = source.replace("(", " ( ").replace(")", " ) ")
     return source.split()
 
@@ -209,7 +211,7 @@ class REPL(cmd.Cmd, object):
         super(REPL, self).preloop()
 
     def postloop(self):
-        print '\nBye :)'
+        print grey('\nBye :)')
         super(REPL, self).postloop()
 
 if __name__ == '__main__':
