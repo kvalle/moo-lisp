@@ -13,6 +13,9 @@ git stash -q --keep-index
 
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
 
+# Clean up all those pesky .pyc files
+rm moolisp/*.pyc
+
 # Run tests
 info "running tests"
 nosetests
@@ -24,7 +27,7 @@ then
 else
     # Run flake8 to check for code problems
     info "checking for code smells"
-    flake8 *.py
+    flake8 moolisp/*.py
 fi
 
 # Put back un-staged code

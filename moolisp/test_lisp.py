@@ -1,5 +1,5 @@
 from nose.tools import assert_equals
-from moolisp import interpret
+from interpreter import interpret
 
 class TestMyLisp:
 

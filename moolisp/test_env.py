@@ -1,5 +1,6 @@
 from nose.tools import assert_equals, assert_raises_regexp
-from moolisp import LispNamingError, Environment
+from errors import LispNamingError
+from env import Environment
 
 class TestEnvironment:
 
