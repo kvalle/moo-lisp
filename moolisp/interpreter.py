@@ -18,7 +18,13 @@ def parse(source):
 
 def preprocess(source):
     "Preprocessing steps such as removing comments (string -> string)"
-    return re.sub(r";.*\n", "\n", source)
+    # remove comments
+    source = re.sub(r";.*\n", "\n", source)  
+    # 'foo -> (quote foo)
+    source = re.sub(r"'([\w]+)", r"(quote \1)", source)  
+    # '(foo bar lol) -> (quote (foo bar lol))
+    source = re.sub(r"'\((.*)\)", r"(quote (\1))", source)  
+    return source
 
 def tokenize(source):
     "Create list of tokens from (preprocessed) program source"
@@ -33,7 +39,7 @@ def analyze(tokens):
     """
     sexp, rest = _read_elem(tokens)
     if len(rest) > 0:
-        raise LispSyntaxError("Expected EOF got '%s'" % to_string(rest))
+        raise LispSyntaxError("Expected EOF got %s" % to_string(rest))
     return sexp
 
 def _read_elem(tokens):

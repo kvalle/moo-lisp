@@ -48,3 +48,10 @@ class TestParsing:
         """
         expected_ast = ['define', 'variable', ['if', True, 42, ['something', 'else']]]
         assert_equals(expected_ast, parse(program))
+
+    def test_parse_quote_tick_on_symbol(self):
+        assert_equals(["quote", "foo"], parse("'foo"))
+
+    def test_parse_quote_tick_on_list(self):
+        assert_equals(["quote", ["foo", "bar"]], parse("'(foo bar)"))
+        assert_equals(["quote", []], parse("'()"))

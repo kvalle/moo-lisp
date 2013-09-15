@@ -53,3 +53,10 @@ Special forms
       Examples: 
         ((lambda (x) (+1 x)) 2)
         (sum 1 2 3)
+
+  quoting
+
+      → (quote <exp>)
+      → '<exp>
+
+      Returns <exp> without evaluating it.
