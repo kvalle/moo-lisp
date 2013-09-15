@@ -1,4 +1,4 @@
-from nose.tools import assert_equals, assert_raises_regexp
+from nose.tools import assert_equals, assert_raises_regexp, assert_false
 
 from interpreter import evaluate, parse
 from errors import LispNamingError, LispSyntaxError
@@ -150,3 +150,30 @@ class TestEval:
 
         ast = ["quote", ["foo", ["+", 1, 2], ["*", 4, 10]]]
         assert_equals(ast[1], evaluate(ast, Environment()))
+
+    def test_set_bang(self):
+        """The set! special form updates an already defined variable."""
+
+        env = Environment({"x": 1})
+        ast = ["set!", "x", 2]
+        evaluate(ast, env)
+        assert_equals(2, env["x"])
+
+    def test_set_bang_on_undefined_variable(self):
+        """Only defined variables can be updated."""
+
+        with assert_raises_regexp(LispNamingError, "undefined"):
+            evaluate(["set!", "wtf", True], Environment())
+
+    def test_set_bang_only_updates_visible_variable(self):
+        """Only the innermost (visible) variable binding should be updated"""
+
+        outer = Environment({"x": 1})
+        middle = Environment({"x": 2}, outer)
+        inner = Environment({}, middle)
+
+        evaluate(["set!", "x", 3], inner)
+
+        assert_false("x" in inner)
+        assert_equals(3, middle["x"])
+        assert_equals(1, outer["x"])

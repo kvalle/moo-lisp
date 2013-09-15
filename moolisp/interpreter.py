@@ -97,14 +97,20 @@ def evaluate(ast, env):
         _assert_exp_length(ast, 2, "quote")
         (_, exp) = ast
         return exp
+    elif ast[0] == 'set!':
+        _assert_exp_length(ast, 3, "set!")
+        (_, var, exp) = ast
+        defining_env = env.defining_env(var)[var] = evaluate(exp, env)
     else:
         fn = evaluate(ast[0], env)
         args = [evaluate(exp, env) for exp in ast[1:]]
         return fn(*args)
 
 def _assert_exp_length(ast, length, name):
-    if len(ast) != length:
-        raise LispSyntaxError("Malformed %s: %s" % (name, to_string(ast)))
+    if len(ast) > length:
+        raise LispSyntaxError("Malformed %s, too many arguments: %s" % (name, to_string(ast)))
+    elif len(ast) < length:
+        raise LispSyntaxError("Malformed %s, too few arguments: %s" % (name, to_string(ast)))
 
 def interpret(source, env):
     """Interpret a moo-lisp program statement."""
