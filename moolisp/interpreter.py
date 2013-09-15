@@ -100,7 +100,7 @@ def evaluate(ast, env):
     elif ast[0] == 'set!':
         _assert_exp_length(ast, 3, "set!")
         (_, var, exp) = ast
-        defining_env = env.defining_env(var)[var] = evaluate(exp, env)
+        env.defining_env(var)[var] = evaluate(exp, env)
     else:
         fn = evaluate(ast[0], env)
         args = [evaluate(exp, env) for exp in ast[1:]]
