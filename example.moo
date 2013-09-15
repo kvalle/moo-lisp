@@ -2,7 +2,7 @@
 
 ;; To run the code:
 ;;
-;;    ./moo exapmle.moo
+;;    ./moo example.moo
 ;;
 
 (define fact 
