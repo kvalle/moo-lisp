@@ -6,3 +6,5 @@ class LispSyntaxError(SyntaxError, LispError):
     pass
 class LispNamingError(LookupError, LispError): 
     pass
+class LispTypeError(TypeError, LispError): 
+    pass

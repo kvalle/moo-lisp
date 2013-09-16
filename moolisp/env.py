@@ -20,8 +20,3 @@ class Environment(dict):
             return self.outer.defining_env(variable)
         else:
             raise LispNamingError("Variable '%s' is undefined" % variable)
-
-default_environment = Environment({
-    "*": op.mul, "-": op.sub, "+": op.add, "/": op.div,
-    '>': op.gt, '<': op.lt, '>=': op.ge, '<=': op.le, '=': op.eq, 'not': op.not_
-})

@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import re
-from errors import LispSyntaxError
+from errors import LispSyntaxError, LispTypeError
 from env import Environment
+
+class Closure:
+    def __init__(self, fn, env):
+        self.fn = fn
+        self.env = env
 
 def to_string(ast):
     if isinstance(ast, list):
@@ -84,10 +89,11 @@ def evaluate(ast, env):
         _assert_exp_length(ast, 3, "define")
         (_, variable, expression) = ast
         env[variable] = evaluate(expression, env)
-    elif ast[0] == 'lambda':
+    elif ast[0] == 'lambda' or ast[0] == 'λ':
         _assert_exp_length(ast, 3, "lambda")
         (_, params, body) = ast
-        return lambda *args: evaluate(body, Environment(zip(params, args), env))
+        fn = {"params": params, "body": body}
+        return Closure(fn, env)
     elif ast[0] == 'begin':
         if len(ast[1:]) == 0:
             raise LispSyntaxError("begin cannot be empty: %s" % to_string(ast))
@@ -101,10 +107,23 @@ def evaluate(ast, env):
         _assert_exp_length(ast, 3, "set!")
         (_, var, exp) = ast
         env.defining_env(var)[var] = evaluate(exp, env)
+    elif ast[0] == "-": 
+        return evaluate(ast[1], env) - evaluate(ast[2], env)
+    elif ast[0] == "*": 
+        return evaluate(ast[1], env) * evaluate(ast[2], env)
+    elif ast[0] == "<=": 
+        return evaluate(ast[1], env) <= evaluate(ast[2], env)
     else:
-        fn = evaluate(ast[0], env)
+        cls = evaluate(ast[0], env)
+        if not isinstance(cls, Closure):
+            raise LispTypeError("Call to non-function: " + to_string(ast))
         args = [evaluate(exp, env) for exp in ast[1:]]
-        return fn(*args)
+        params = cls.fn["params"]
+        if not len(args) == len(params):
+            msg = "Wrong number of arguments, expected %d got %d: %s" \
+                % (len(params), len(args), to_string(ast))
+            raise LispTypeError(msg)
+        return evaluate(cls.fn["body"], Environment(zip(params, args), env))
 
 def _assert_exp_length(ast, length, name):
     if len(ast) > length:
@@ -112,6 +131,8 @@ def _assert_exp_length(ast, length, name):
     elif len(ast) < length:
         raise LispSyntaxError("Malformed %s, too few arguments: %s" % (name, to_string(ast)))
 
-def interpret(source, env):
+def interpret(source, env=None):
     """Interpret a moo-lisp program statement."""
+    if env is None:
+        env = Environment()
     return evaluate(parse(source), env)

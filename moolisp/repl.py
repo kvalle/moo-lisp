@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import copy
-
 from errors import LispError
 from colors import colored, grey
-from env import default_environment
+from env import Environment
 from interpreter import interpret, to_string, preprocess
 
 # importing this gives readline goodness when running on systems
@@ -22,7 +20,7 @@ def repl():
     print "                       " + grey("        ||     ||    ")
     print
 
-    env = copy.deepcopy(default_environment)
+    env = Environment()
     try:
         while True:
             try:

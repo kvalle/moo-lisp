@@ -1,11 +1,11 @@
 from nose.tools import assert_equals
 from interpreter import interpret
-from env import default_environment
+from env import Environment
 
 class TestMyLisp:
 
     def test_factorial_program(self):
-        env = default_environment
+        env = Environment()
         interpret("""
             (define fact
                 (lambda (n)
