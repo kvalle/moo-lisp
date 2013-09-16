@@ -106,7 +106,7 @@ class TestEval:
         ast = [["lambda", ["x"], "x"], 42]
         assert_equals(42, evaluate(ast, Environment()))
 
-    def test_lambda_with_argument(self):
+    def test_lambda_with_argument_and_env(self):
         """Test that arguments overshadow variables defined in the environment
         when the function body is evaluated"""
 
