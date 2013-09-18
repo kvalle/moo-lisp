@@ -241,3 +241,19 @@ class TestEval:
         env = Environment({'x': 2, '+': Builtin(lambda a, b: a + b)})
         ast = ['+', ['if', True, 2, 'whatever'], 'x']
         assert_equals(4, evaluate(ast, env))
+
+    def test_eval_simple_expression(self):
+        """Eval takes one argument, evaluates it (like all functions) and 
+        evaluates the evaluated argument"""
+
+        # equivalent to evaluate("foo")
+        with assert_raises_regexp(LispNamingError, "Variable 'foo' is undefined"):
+            assert_equals("foo", evaluate(["eval", ["quote", "foo"]], Environment()))
+
+        # equivalent to evaluate(["quote, "foo"])
+        ast = ["eval", ["quote", ["quote", "foo"]]]
+        assert_equals("foo", evaluate(ast, Environment()))
+
+        # equivalent to evaluate(["quote, ["quote, "foo"]])
+        ast = ["eval", ["quote", ["quote", ["quote", "foo"]]]]
+        assert_equals(["quote", "foo"], evaluate(ast, Environment()))

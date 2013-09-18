@@ -81,6 +81,10 @@ def evaluate(ast, env):
         _assert_exp_length(ast, 4)
         (_, pred, then_exp, else_exp) = ast
         return evaluate((then_exp if evaluate(pred, env) else else_exp), env)
+    elif ast[0] == 'eval':
+        _assert_exp_length(ast, 2)
+        (_, exp) = ast
+        return evaluate(evaluate(exp, env), env)
     elif ast[0] == 'define': 
         _assert_exp_length(ast, 3)
         (_, variable, expression) = ast
