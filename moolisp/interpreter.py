@@ -78,15 +78,15 @@ def evaluate(ast, env):
     elif not isinstance(ast, list):
         return ast
     elif ast[0] == 'if': 
-        _assert_exp_length(ast, 4, "if")
+        _assert_exp_length(ast, 4)
         (_, pred, then_exp, else_exp) = ast
         return evaluate((then_exp if evaluate(pred, env) else else_exp), env)
     elif ast[0] == 'define': 
-        _assert_exp_length(ast, 3, "define")
+        _assert_exp_length(ast, 3)
         (_, variable, expression) = ast
         env[variable] = evaluate(expression, env)
     elif ast[0] == 'lambda' or ast[0] == 'λ':
-        _assert_exp_length(ast, 3, "lambda")
+        _assert_exp_length(ast, 3)
         (_, params, body) = ast
         return Lambda(params, body, env)
     elif ast[0] == 'begin':
@@ -95,11 +95,11 @@ def evaluate(ast, env):
         results = [evaluate(exp, env) for exp in ast[1:]]
         return results[-1]
     elif ast[0] == 'quote':
-        _assert_exp_length(ast, 2, "quote")
+        _assert_exp_length(ast, 2)
         (_, exp) = ast
         return exp
     elif ast[0] == 'set!':
-        _assert_exp_length(ast, 3, "set!")
+        _assert_exp_length(ast, 3)
         (_, var, exp) = ast
         env.defining_env(var)[var] = evaluate(exp, env)
     else:
@@ -119,12 +119,12 @@ def evaluate(ast, env):
         else:
             raise Exception("Unknown implementation of Closure: %s" % cls)
 
-def _assert_exp_length(ast, length, name):
+def _assert_exp_length(ast, length):
     if len(ast) > length:
-        msg = "Malformed %s, too many arguments: %s" % (name, to_string(ast))
+        msg = "Malformed %s, too many arguments: %s" % (ast[0], to_string(ast))
         raise LispSyntaxError(msg)
     elif len(ast) < length:
-        msg = "Malformed %s, too few arguments: %s" % (name, to_string(ast))
+        msg = "Malformed %s, too few arguments: %s" % (ast[0], to_string(ast))
         raise LispSyntaxError(msg)
 
 def interpret(source, env=None):

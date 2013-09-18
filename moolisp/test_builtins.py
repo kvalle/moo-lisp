@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from nose.tools import assert_equals, assert_true, assert_false
 
 from interpreter import interpret

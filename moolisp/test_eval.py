@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from nose.tools import assert_equals, assert_raises_regexp, \
     assert_raises, assert_false, assert_is_instance
 
@@ -28,33 +30,42 @@ class TestEval:
         assert_equals(42, evaluate(ast, Environment()))
 
     def test_if_with_variable_lookup(self):
+        """Test evaluation of expressions (variable lookup) within if form"""
+
         ast = ["if", "pred", "then", "else"]
         env = Environment({"pred": False, "else": 42})
         assert_equals(42, evaluate(ast, env))
 
     def test_wrong_if_syntax(self):
+        """Test evaluating if expression with too many parts"""
+
         with assert_raises_regexp(LispSyntaxError, "Malformed if"):
             evaluate(["if", "with", "far", "too", "many", "parts"], Environment())
 
     def test_define(self):
-        ast = ["define", "x", 1000]
+        """Test simplest possible define"""
+
         env = Environment()
-        evaluate(ast, env)
+        evaluate(["define", "x", 1000], env)
         assert_equals(1000, env["x"])
 
     def test_wrong_define_syntax(self):
+        """Malformed defines should throw an error"""
+
         with assert_raises_regexp(LispSyntaxError, "Malformed define"):
             evaluate(["define", "x"], Environment())
 
     def test_lambda_evaluates_to_lambda_which_is_a_closure(self):
-        "The lambda form should evaluate to a lambda object extending closure"
+        """The lambda form should evaluate to a lambda object extending closure"""
+
         ast = ["lambda", [], 42]
         lm = evaluate(ast, Environment())
         assert_is_instance(lm, Lambda) 
         assert_is_instance(lm, Closure) 
 
     def test_lambda_closure_keeps_defining_env(self):
-        "The lambda closure needs to keep a copy of the environment where it was defined"
+        """The closure should keep a copy of the environment where it was defined"""
+
         env = Environment({"foo": 1, "bar": 2})
         ast = ["lambda", [], 42]
         lm = evaluate(ast, env)
@@ -69,6 +80,13 @@ class TestEval:
         assert_equals(lm.params, params)
         assert_equals(lm.body, body)
 
+    def test_using_lambda_character(self):
+        """The λ character should be an valid alternaltive to writing "lambda" """
+
+        env = Environment({"x": 42})
+        assert_equals(42, evaluate([["λ", [], "x"]], env))
+        assert_equals(42, evaluate([["lambda", [], "x"]], env))
+
     def test_call_to_non_function(self):
         "Should raise a TypeError when a non-closure is called as a function"
         with assert_raises(LispTypeError):
@@ -77,6 +95,8 @@ class TestEval:
             evaluate(["foo", 1, 2], Environment({"foo": 42}))
 
     def test_calling_with_wrong_number_of_arguments(self):
+        """Lambda should raise exception when called with wrong number of arguments"""
+
         env = Environment()
         evaluate(["define", "fn", ["lambda", ["x", "y"], 42]], env)
         with assert_raises_regexp(LispTypeError, "expected 2"):
@@ -209,14 +229,14 @@ class TestEval:
         assert_equals(1, outer["x"])
 
     def test_calling_a_builtin_function(self):
-        "Tests that calling a builtin function gives the expected result"
+        """Tests that calling a builtin function gives the expected result"""
 
         env = Environment({'+': Builtin(lambda a, b: a + b)})
         assert_equals(4, evaluate(["+", 2, 2], env))
 
     def test_calling_builtin_forces_argument_evaluation(self):
-        """When biltins (like regular lambdas) are call-by-value, 
-        and arguments thould therefore be evaluated before sending them on"""
+        """Bultins (like the regular lambdas) are call-by-value 
+        and the arguments thould therefore be evaluated first"""
 
         env = Environment({'x': 2, '+': Builtin(lambda a, b: a + b)})
         ast = ['+', ['if', True, 2, 'whatever'], 'x']
