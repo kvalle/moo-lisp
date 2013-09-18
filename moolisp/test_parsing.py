@@ -53,6 +53,7 @@ class TestParsing:
 
     def test_parse_quote_tick_on_symbol(self):
         assert_equals(["quote", "foo"], parse("'foo"))
+        assert_equals(["quote", "+"], parse("'+"))
 
     def test_parse_quote_tick_on_list(self):
         assert_equals(["quote", ["foo", "bar"]], parse("'(foo bar)"))
