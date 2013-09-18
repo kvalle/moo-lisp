@@ -1,7 +1,7 @@
 from nose.tools import assert_equals, assert_raises_regexp, \
     assert_raises, assert_false, assert_is_instance
 
-from interpreter import evaluate, parse, Closure
+from interpreter import evaluate, parse, Closure, Lambda
 from errors import LispNamingError, LispSyntaxError, LispTypeError
 from env import Environment
 
@@ -45,26 +45,31 @@ class TestEval:
         with assert_raises_regexp(LispSyntaxError, "Malformed define"):
             evaluate(["define", "x"], Environment())
 
-    def test_lambda_evaluates_to_closure(self):
+    def test_lambda_evaluates_to_lambda_which_is_a_closure(self):
+        "The lambda form should evaluate to a lambda object extending closure"
         ast = ["lambda", [], 42]
-        closure = evaluate(ast, Environment())
-        assert_is_instance(closure, Closure) 
+        lm = evaluate(ast, Environment())
+        assert_is_instance(lm, Lambda) 
+        assert_is_instance(lm, Closure) 
 
     def test_lambda_closure_keeps_defining_env(self):
+        "The lambda closure needs to keep a copy of the environment where it was defined"
         env = Environment({"foo": 1, "bar": 2})
         ast = ["lambda", [], 42]
-        closure = evaluate(ast, env)
-        assert_equals(closure.env, env) 
+        lm = evaluate(ast, env)
+        assert_equals(lm.env, env) 
 
     def test_lambda_closure_holds_function(self):
+        "The function part of the lambda closure is the parameters and the body"
         params = ["x", "y"]
         body = ["+", "x", "y"]
         ast = ["lambda", params, body]
-        closure = evaluate(ast, Environment)
-        assert_equals(closure.fn["params"], params)
-        assert_equals(closure.fn["body"], body)
+        lm = evaluate(ast, Environment)
+        assert_equals(lm.params, params)
+        assert_equals(lm.body, body)
 
     def test_call_to_non_function(self):
+        "Should raise a TypeError when a non-closure is called as a function"
         with assert_raises(LispTypeError):
             evaluate([True, 1, 2], Environment())
         with assert_raises(LispTypeError):

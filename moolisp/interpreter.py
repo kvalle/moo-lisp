@@ -5,8 +5,13 @@ from errors import LispSyntaxError, LispTypeError
 from env import Environment
 
 class Closure:
-    def __init__(self, fn, env):
-        self.fn = fn
+    "Abstract base type for builtins and lambdas"
+    pass
+
+class Lambda(Closure):
+    def __init__(self, params, body, env):
+        self.params = params
+        self.body = body
         self.env = env
 
 def to_string(ast):
@@ -92,8 +97,7 @@ def evaluate(ast, env):
     elif ast[0] == 'lambda' or ast[0] == 'λ':
         _assert_exp_length(ast, 3, "lambda")
         (_, params, body) = ast
-        fn = {"params": params, "body": body}
-        return Closure(fn, env)
+        return Lambda(params, body, env)
     elif ast[0] == 'begin':
         if len(ast[1:]) == 0:
             raise LispSyntaxError("begin cannot be empty: %s" % to_string(ast))
@@ -117,13 +121,16 @@ def evaluate(ast, env):
         cls = evaluate(ast[0], env)
         if not isinstance(cls, Closure):
             raise LispTypeError("Call to non-function: " + to_string(ast))
+
         args = [evaluate(exp, env) for exp in ast[1:]]
-        params = cls.fn["params"]
-        if not len(args) == len(params):
-            msg = "Wrong number of arguments, expected %d got %d: %s" \
-                % (len(params), len(args), to_string(ast))
-            raise LispTypeError(msg)
-        return evaluate(cls.fn["body"], Environment(zip(params, args), env))
+        if isinstance(cls, Lambda):
+            if len(args) != len(cls.params):
+                msg = "Wrong number of arguments, expected %d got %d: %s" \
+                    % (len(cls.params), len(args), to_string(ast))
+                raise LispTypeError(msg)
+            return evaluate(cls.body, Environment(zip(cls.params, args), env))
+        else:
+            raise Exception("Not implemented yet: %s" % cls)
 
 def _assert_exp_length(ast, length, name):
     if len(ast) > length:
