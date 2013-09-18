@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import operator as op
 from errors import LispNamingError
 
 class Environment(dict):

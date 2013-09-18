@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
-from errors import LispSyntaxError, LispTypeError, LispPythonInteropError
+from errors import LispSyntaxError, LispTypeError
 from env import Environment
 
 class Closure:
@@ -113,13 +113,6 @@ def evaluate(ast, env):
         return evaluate(ast[1], env) * evaluate(ast[2], env)
     elif ast[0] == "<=": 
         return evaluate(ast[1], env) <= evaluate(ast[2], env)
-    elif isinstance(ast[0], str) and ast[0].startswith("."):
-        try:
-            fn = eval(ast[0][1:])
-            args = [evaluate(exp, env) for exp in ast[1:]]
-            return fn(*args)
-        except Exception, e:
-            raise LispPythonInteropError("Python interop error: %s" % e)
     else:
         cls = evaluate(ast[0], env)
         if not isinstance(cls, Closure):
@@ -134,9 +127,11 @@ def evaluate(ast, env):
 
 def _assert_exp_length(ast, length, name):
     if len(ast) > length:
-        raise LispSyntaxError("Malformed %s, too many arguments: %s" % (name, to_string(ast)))
+        msg = "Malformed %s, too many arguments: %s" % (name, to_string(ast))
+        raise LispSyntaxError(msg)
     elif len(ast) < length:
-        raise LispSyntaxError("Malformed %s, too few arguments: %s" % (name, to_string(ast)))
+        msg = "Malformed %s, too few arguments: %s" % (name, to_string(ast))
+        raise LispSyntaxError(msg)
 
 def interpret(source, env=None):
     """Interpret a moo-lisp program statement."""

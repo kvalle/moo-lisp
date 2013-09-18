@@ -1,5 +1,5 @@
 from nose.tools import assert_equals, assert_raises_regexp, \
-        assert_raises, assert_false, assert_is_instance
+    assert_raises, assert_false, assert_is_instance
 
 from interpreter import evaluate, parse, Closure
 from errors import LispNamingError, LispSyntaxError, LispTypeError
