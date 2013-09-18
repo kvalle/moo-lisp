@@ -2,7 +2,7 @@
 
 import re
 from errors import LispSyntaxError, LispTypeError
-from env import Environment
+from env import Environment, get_default_env
 from types import Closure, Lambda, Builtin 
 
 def to_string(ast):
@@ -130,5 +130,5 @@ def _assert_exp_length(ast, length, name):
 def interpret(source, env=None):
     """Interpret a moo-lisp program statement."""
     if env is None:
-        env = Environment()
+        env = get_default_env()
     return evaluate(parse(source), env)

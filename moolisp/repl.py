@@ -2,7 +2,7 @@
 
 from errors import LispError
 from colors import colored, grey
-from env import Environment
+from env import get_default_env
 from interpreter import interpret, to_string, preprocess
 
 # importing this gives readline goodness when running on systems
@@ -20,7 +20,7 @@ def repl():
     print "                       " + grey("        ||     ||    ")
     print
 
-    env = Environment()
+    env = get_default_env()
     try:
         while True:
             try:
