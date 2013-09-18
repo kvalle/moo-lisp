@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from errors import LispNamingError
+from types import Builtin
+import operator as op
 
 class Environment(dict):
     def __init__(self, vars=None, outer=None):
@@ -19,3 +21,18 @@ class Environment(dict):
             return self.outer.defining_env(variable)
         else:
             raise LispNamingError("Variable '%s' is undefined" % variable)
+
+def get_default_env():
+    return Environment({
+        '+': Builtin(op.add),
+        '-': Builtin(op.sub),
+        '*': Builtin(op.mul),
+        '/': Builtin(op.div),
+        'mod': Builtin(lambda x, y: x % y),
+
+        '=': Builtin(op.eq), 
+        '>': Builtin(op.gt), 
+        '<': Builtin(op.lt), 
+        '>=': Builtin(op.ge), 
+        '<=': Builtin(op.le)
+    })

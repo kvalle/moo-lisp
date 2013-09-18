@@ -3,16 +3,7 @@
 import re
 from errors import LispSyntaxError, LispTypeError
 from env import Environment
-
-class Closure:
-    "Abstract base type for builtins and lambdas"
-    pass
-
-class Lambda(Closure):
-    def __init__(self, params, body, env):
-        self.params = params
-        self.body = body
-        self.env = env
+from types import Closure, Lambda, Builtin 
 
 def to_string(ast):
     if isinstance(ast, list):
@@ -111,12 +102,6 @@ def evaluate(ast, env):
         _assert_exp_length(ast, 3, "set!")
         (_, var, exp) = ast
         env.defining_env(var)[var] = evaluate(exp, env)
-    elif ast[0] == "-": 
-        return evaluate(ast[1], env) - evaluate(ast[2], env)
-    elif ast[0] == "*": 
-        return evaluate(ast[1], env) * evaluate(ast[2], env)
-    elif ast[0] == "<=": 
-        return evaluate(ast[1], env) <= evaluate(ast[2], env)
     else:
         cls = evaluate(ast[0], env)
         if not isinstance(cls, Closure):
@@ -129,8 +114,10 @@ def evaluate(ast, env):
                     % (len(cls.params), len(args), to_string(ast))
                 raise LispTypeError(msg)
             return evaluate(cls.body, Environment(zip(cls.params, args), env))
+        elif isinstance(cls, Builtin):
+            return cls.fn(*args)
         else:
-            raise Exception("Not implemented yet: %s" % cls)
+            raise Exception("Unknown implementation of Closure: %s" % cls)
 
 def _assert_exp_length(ast, length, name):
     if len(ast) > length:

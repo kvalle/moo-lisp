@@ -1,9 +1,10 @@
 from nose.tools import assert_equals, assert_raises_regexp, \
     assert_raises, assert_false, assert_is_instance
 
-from interpreter import evaluate, parse, Closure, Lambda
+from interpreter import evaluate, parse
+from types import Closure, Lambda, Builtin
 from errors import LispNamingError, LispSyntaxError, LispTypeError
-from env import Environment
+from env import Environment, get_default_env
 
 class TestEval:
 
@@ -206,3 +207,27 @@ class TestEval:
         assert_false("x" in inner)
         assert_equals(3, middle["x"])
         assert_equals(1, outer["x"])
+
+    def test_calling_a_builtin_function(self):
+        "Tests that calling a builtin function gives the expected result"
+
+        env = Environment({'+': Builtin(lambda a, b: a + b)})
+        assert_equals(4, evaluate(["+", 2, 2], env))
+
+    def test_calling_builtin_forces_argument_evaluation(self):
+        """When biltins (like regular lambdas) are call-by-value, 
+        and arguments thould therefore be evaluated before sending them on"""
+
+        env = Environment({'x': 2, '+': Builtin(lambda a, b: a + b)})
+        ast = ['+', ['if', True, 2, 'whatever'], 'x']
+        assert_equals(4, evaluate(ast, env))
+
+    def test_default_builtin_functions(self):
+        """A quick check on some of the default builtins"""
+
+        env = get_default_env()
+        assert_equals(5, evaluate(['+', 2, 3], env))
+        assert_equals(3, evaluate(['-', 5, 2], env))
+        assert_equals(8, evaluate(['*', 4, 2], env))
+        assert_equals(8, evaluate(['/', 16, 2], env))
+        assert_equals(1, evaluate(['mod', 5, 2], env))
