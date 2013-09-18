@@ -34,5 +34,11 @@ def get_default_env():
         '>': Builtin(op.gt), 
         '<': Builtin(op.lt), 
         '>=': Builtin(op.ge), 
-        '<=': Builtin(op.le)
+        '<=': Builtin(op.le),
+
+        'nil': [],
+        'cons': Builtin(lambda h, rest: [h] + rest),
+        'car': Builtin(lambda lst: lst[0]),
+        'cdr': Builtin(lambda lst: lst[1:]),
+        'list': Builtin(lambda *args: list(args))
     })

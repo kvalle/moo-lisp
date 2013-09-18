@@ -4,7 +4,7 @@ from nose.tools import assert_equals, assert_raises_regexp, \
 from interpreter import evaluate, parse
 from types import Closure, Lambda, Builtin
 from errors import LispNamingError, LispSyntaxError, LispTypeError
-from env import Environment, get_default_env
+from env import Environment
 
 class TestEval:
 
@@ -221,13 +221,3 @@ class TestEval:
         env = Environment({'x': 2, '+': Builtin(lambda a, b: a + b)})
         ast = ['+', ['if', True, 2, 'whatever'], 'x']
         assert_equals(4, evaluate(ast, env))
-
-    def test_default_builtin_functions(self):
-        """A quick check on some of the default builtins"""
-
-        env = get_default_env()
-        assert_equals(5, evaluate(['+', 2, 3], env))
-        assert_equals(3, evaluate(['-', 5, 2], env))
-        assert_equals(8, evaluate(['*', 4, 2], env))
-        assert_equals(8, evaluate(['/', 16, 2], env))
-        assert_equals(1, evaluate(['mod', 5, 2], env))
