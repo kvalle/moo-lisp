@@ -1,10 +1,3 @@
-
-                              ^__^         
-                MOO           (oo)\_______      
-          the not all that    (__)\       )\/\        
-            serious lisp          ||----w |           
-                                  ||     ||          
-
 Primitives
 
   Integers: 1, 2, 3, and, you know, so on
@@ -60,3 +53,11 @@ Special forms
       → '<exp>
 
       Returns <exp> without evaluating it.
+
+  eval
+
+      → (eval <exp>)
+
+      The eval form evaluates whatever is passed to it as a moo-lisp 
+      program. This means that <exp> is first evaluated to get its value
+      which is then evaluated.
