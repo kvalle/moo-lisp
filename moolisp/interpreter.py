@@ -5,9 +5,9 @@ from errors import LispSyntaxError, LispTypeError
 from env import Environment, get_default_env
 from types import Closure, Lambda, Builtin 
 
-def to_string(ast):
+def unparse(ast):
     if isinstance(ast, list):
-        return "(%s)" % " ".join([to_string(x) for x in ast])
+        return "(%s)" % " ".join([unparse(x) for x in ast])
     elif isinstance(ast, bool):
         return "#t" if ast else "#f"
     else:
@@ -40,7 +40,7 @@ def analyze(tokens):
     """
     sexp, rest = _read_elem(tokens)
     if len(rest) > 0:
-        raise LispSyntaxError("Expected EOF got %s" % to_string(rest))
+        raise LispSyntaxError("Expected EOF got %s" % unparse(rest))
     return sexp
 
 def _read_elem(tokens):
@@ -95,7 +95,7 @@ def evaluate(ast, env):
         return Lambda(params, body, env)
     elif ast[0] == 'begin':
         if len(ast[1:]) == 0:
-            raise LispSyntaxError("begin cannot be empty: %s" % to_string(ast))
+            raise LispSyntaxError("begin cannot be empty: %s" % unparse(ast))
         results = [evaluate(exp, env) for exp in ast[1:]]
         return results[-1]
     elif ast[0] == 'quote':
@@ -109,13 +109,13 @@ def evaluate(ast, env):
     else:
         cls = evaluate(ast[0], env)
         if not isinstance(cls, Closure):
-            raise LispTypeError("Call to non-function: " + to_string(ast))
+            raise LispTypeError("Call to non-function: " + unparse(ast))
 
         args = [evaluate(exp, env) for exp in ast[1:]]
         if isinstance(cls, Lambda):
             if len(args) != len(cls.params):
                 msg = "Wrong number of arguments, expected %d got %d: %s" \
-                    % (len(cls.params), len(args), to_string(ast))
+                    % (len(cls.params), len(args), unparse(ast))
                 raise LispTypeError(msg)
             return evaluate(cls.body, Environment(zip(cls.params, args), env))
         elif isinstance(cls, Builtin):
@@ -125,10 +125,10 @@ def evaluate(ast, env):
 
 def _assert_exp_length(ast, length):
     if len(ast) > length:
-        msg = "Malformed %s, too many arguments: %s" % (ast[0], to_string(ast))
+        msg = "Malformed %s, too many arguments: %s" % (ast[0], unparse(ast))
         raise LispSyntaxError(msg)
     elif len(ast) < length:
-        msg = "Malformed %s, too few arguments: %s" % (ast[0], to_string(ast))
+        msg = "Malformed %s, too few arguments: %s" % (ast[0], unparse(ast))
         raise LispSyntaxError(msg)
 
 def interpret(source, env=None):

@@ -30,5 +30,5 @@ def colored(text, color, attr=None):
 
     return color + attr + text + reset
 
-def grey(text):
+def faded(text):
     return colored(text, "grey", attr='bold')

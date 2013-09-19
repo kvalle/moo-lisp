@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from errors import LispError
-from colors import colored, grey
+from colors import colored, faded
 from env import get_default_env
-from interpreter import interpret, to_string, preprocess
+from interpreter import interpret, unparse, preprocess
 
 # importing this gives readline goodness when running on systems
 # where it is supported (i.e. UNIX-y systems)
@@ -13,11 +13,11 @@ def repl():
     """Start the interactive Read-Eval-Print-Loop
     """
     print
-    print "                       " + grey("    ^__^             ")
-    print "          welcome to   " + grey("    (oo)\_______     ")
-    print "         the MOO-lisp  " + grey("    (__)\       )\/\ ")
-    print "             REPL      " + grey("        ||----w |    ")
-    print "                       " + grey("        ||     ||    ")
+    print "                       " + faded("    ^__^             ")
+    print "          welcome to   " + faded("    (oo)\_______     ")
+    print "         the MOO-lisp  " + faded("    (__)\       )\/\ ")
+    print "             REPL      " + faded("        ||----w |    ")
+    print "                       " + faded("        ||     ||    ")
     print
 
     env = get_default_env()
@@ -31,11 +31,11 @@ def repl():
                 else:
                     result = interpret(source, env)
                     if result is not None: 
-                        print to_string(result)
+                        print unparse(result)
             except LispError, e:
                 print colored("! ", "red") + str(e)
     except (EOFError, KeyboardInterrupt):
-        print colored("\nBye! o/", "grey")
+        print faded("\nBye! o/")
 
 def read_expression():
     "Read from stdin until we have at least one s-expression"
