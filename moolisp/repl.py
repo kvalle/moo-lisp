@@ -18,20 +18,17 @@ def repl():
     print "         the MOO-lisp  " + faded("    (__)\       )\/\ ")
     print "             REPL      " + faded("        ||----w |    ")
     print "                       " + faded("        ||     ||    ")
+    print faded("  use (help) to get help")
     print
 
-    env = get_default_env()
+    env = get_default_env(interactive=True)
     try:
         while True:
             try:
                 source = read_expression()
-                if source.strip() == "(help)":
-                    with open('moolisp/usage.txt', 'r') as f:
-                        print "".join(f.readlines())
-                else:
-                    result = interpret(source, env)
-                    if result is not None: 
-                        print unparse(result)
+                result = interpret(source, env)
+                if result is not None: 
+                    print unparse(result)
             except LispError, e:
                 print colored("! ", "red") + str(e)
     except (EOFError, KeyboardInterrupt):
