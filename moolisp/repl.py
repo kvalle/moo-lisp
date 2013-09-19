@@ -3,7 +3,8 @@
 from errors import LispError
 from colors import colored, faded
 from env import get_default_env
-from interpreter import interpret, unparse, preprocess
+from parser import parse, unparse, preprocess
+from evaluator import evaluate
 
 # importing this gives readline goodness when running on systems
 # where it is supported (i.e. UNIX-y systems)
@@ -26,7 +27,7 @@ def repl():
         while True:
             try:
                 source = read_expression()
-                result = interpret(source, env)
+                result = evaluate(parse(source), env)
                 if result is not None: 
                     print unparse(result)
             except LispError, e:

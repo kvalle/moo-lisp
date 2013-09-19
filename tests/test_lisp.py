@@ -2,7 +2,7 @@
 
 from nose.tools import assert_equals
 
-from moolisp.interpreter import interpret
+from moolisp import interpret
 from moolisp.env import get_default_env
 
 class TestMooLisp:

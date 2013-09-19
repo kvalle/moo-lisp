@@ -2,7 +2,7 @@
 
 from nose.tools import assert_equals, assert_raises_regexp
 
-from moolisp.interpreter import tokenize, parse
+from moolisp.parser import tokenize, parse
 from moolisp.errors import LispSyntaxError
 
 class TestParsing:
