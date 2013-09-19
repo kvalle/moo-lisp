@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from nose.tools import assert_equals, assert_raises_regexp
-from errors import LispNamingError
-from env import Environment
+
+from moolisp.errors import LispNamingError
+from moolisp.env import Environment
 
 class TestEnvironment:
 

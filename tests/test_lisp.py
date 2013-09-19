@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from nose.tools import assert_equals
-from interpreter import interpret
-from env import get_default_env
+
+from moolisp.interpreter import interpret
+from moolisp.env import get_default_env
 
 class TestMooLisp:
     """Testing the implementation with a few non-trivial programs"""

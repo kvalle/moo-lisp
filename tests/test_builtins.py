@@ -2,8 +2,8 @@
 
 from nose.tools import assert_equals, assert_true, assert_false
 
-from interpreter import interpret
-from env import get_default_env
+from moolisp.interpreter import interpret
+from moolisp.env import get_default_env
 
 class TestBuiltins:
 

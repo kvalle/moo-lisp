@@ -2,8 +2,8 @@
 
 from nose.tools import assert_equals, assert_raises_regexp
 
-from interpreter import tokenize, parse
-from errors import LispSyntaxError
+from moolisp.interpreter import tokenize, parse
+from moolisp.errors import LispSyntaxError
 
 class TestParsing:
 

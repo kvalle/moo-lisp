@@ -3,10 +3,10 @@
 from nose.tools import assert_equals, assert_raises_regexp, \
     assert_raises, assert_false, assert_is_instance
 
-from interpreter import evaluate, parse
-from types import Closure, Lambda, Builtin
-from errors import LispNamingError, LispSyntaxError, LispTypeError
-from env import Environment
+from moolisp.interpreter import evaluate, parse
+from moolisp.types import Closure, Lambda, Builtin
+from moolisp.errors import LispNamingError, LispSyntaxError, LispTypeError
+from moolisp.env import Environment
 
 class TestEval:
 
