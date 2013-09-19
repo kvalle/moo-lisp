@@ -4,7 +4,7 @@ __all__ = ['repl', 'parse_file', 'interpret', 'tokenize', 'parse', 'evaluate']
 
 import sys
 from evaluator import evaluate
-from parser import tokenize, parse
+from parser import tokenize, parse, unparse
 from repl import repl
 from errors import LispError
 from env import get_default_env
@@ -14,7 +14,7 @@ def parse_file(filename):
     try:
         with open(filename, 'r') as sourcefile:
             source = "(begin %s)" % "".join(sourcefile.readlines())
-            print interpret(source)
+            print unparse(interpret(source))
     except LispError, e:
         print e
         sys.exit(1)

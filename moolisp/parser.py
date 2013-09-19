@@ -5,11 +5,15 @@ import re
 from errors import LispSyntaxError
 
 def unparse(ast):
-    if isinstance(ast, list):
-        return "(%s)" % " ".join([unparse(x) for x in ast])
-    elif isinstance(ast, bool):
+    if isinstance(ast, bool):
         return "#t" if ast else "#f"
+    elif isinstance(ast, list):
+        if ast[0] == "quote":
+            return "'%s" % unparse(ast[1])
+        else:
+            return "(%s)" % " ".join([unparse(x) for x in ast])
     else:
+        # string, integer or Closure
         return str(ast)
 
 def parse(source):
