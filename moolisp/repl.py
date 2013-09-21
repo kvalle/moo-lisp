@@ -32,7 +32,10 @@ def repl():
                     print unparse(result)
             except LispError, e:
                 print colored("! ", "red") + str(e)
-    except (EOFError, KeyboardInterrupt):
+            except (KeyboardInterrupt):
+                msg = "Interupted. " + faded("(Use ^D to exit)")
+                print "\n" + colored("! ", "red") + msg
+    except (EOFError):
         print faded("\nBye! o/")
 
 def read_expression():
