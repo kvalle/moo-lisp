@@ -2,7 +2,7 @@
 
 from nose.tools import assert_equals, assert_raises_regexp
 
-from moolisp.parser import tokenize, parse
+from moolisp.parser import tokenize, parse, expand_quote_ticks
 from moolisp.errors import LispSyntaxError
 
 class TestParsing:
@@ -55,6 +55,22 @@ class TestParsing:
         assert_equals(["quote", "foo"], parse("'foo"))
         assert_equals(["quote", "+"], parse("'+"))
 
+    def test_parse_quote_tick_on_atom(self):
+        assert_equals(["quote", 1], parse("'1"))
+        assert_equals(["quote", True], parse("'#t"))
+
+    def test_nested_quotes(self):
+        assert_equals(["quote", ["quote", "foo"]], parse("''foo"))
+        assert_equals(["quote", ["quote", ["quote", "foo"]]], parse("'''foo"))
+        assert_equals(["quote", ["quote", ["foo", "bar"]]], parse("''(foo bar)"))
+
     def test_parse_quote_tick_on_list(self):
         assert_equals(["quote", ["foo", "bar"]], parse("'(foo bar)"))
         assert_equals(["quote", []], parse("'()"))
+
+    def test_expand_quote_tick(self):
+        assert_equals("(quote foo)", expand_quote_ticks("'foo"))
+        assert_equals("(quote (quote (quote foo)))", expand_quote_ticks("'''foo"))
+
+        assert_equals("(quote (foo bar))", expand_quote_ticks("'(foo bar)"))
+        assert_equals("(quote (quote (quote (foo bar))))", expand_quote_ticks("'''(foo bar)"))

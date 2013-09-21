@@ -28,7 +28,7 @@ def remove_comments(source):
 def expand_quote_ticks(source):
     while re.search(r"'", source):
         # 'foo -> (quote foo)
-        source = re.sub(r"'([^\s\(\)]+)", r"(quote \1)", source)  
+        source = re.sub(r"'([^'\s\(\)]+)", r"(quote \1)", source)  
         # '(foo bar lol) -> (quote (foo bar lol))
         source = re.sub(r"'\((.*)\)", r"(quote (\1))", source)  
     return source
