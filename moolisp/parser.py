@@ -18,16 +18,19 @@ def unparse(ast):
 
 def parse(source):
     "Creates an Abstract Syntax Tree (AST) from program source (as string)"
-    return analyze(tokenize(preprocess(source)))
+    source = remove_comments(source)
+    source = expand_quote_ticks(source)
+    return analyze(tokenize(source))
 
-def preprocess(source):
-    "Preprocessing steps such as removing comments (string -> string)"
-    # remove comments
-    source = re.sub(r";.*\n", "\n", source)  
-    # 'foo -> (quote foo)
-    source = re.sub(r"'([^\s\(\)]+)", r"(quote \1)", source)  
-    # '(foo bar lol) -> (quote (foo bar lol))
-    source = re.sub(r"'\((.*)\)", r"(quote (\1))", source)  
+def remove_comments(source):
+    return re.sub(r";.*\n", "\n", source)
+
+def expand_quote_ticks(source):
+    while re.search(r"'", source):
+        # 'foo -> (quote foo)
+        source = re.sub(r"'([^\s\(\)]+)", r"(quote \1)", source)  
+        # '(foo bar lol) -> (quote (foo bar lol))
+        source = re.sub(r"'\((.*)\)", r"(quote (\1))", source)  
     return source
 
 def tokenize(source):

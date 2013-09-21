@@ -3,7 +3,7 @@
 from errors import LispError
 from colors import colored, faded
 from env import get_default_env
-from parser import parse, unparse, preprocess
+from parser import parse, unparse, remove_comments
 from evaluator import evaluate
 
 # importing this gives readline goodness when running on systems
@@ -53,5 +53,5 @@ def read_line(prompt):
     "Return touple of user input line and number of unclosed parens"
 
     line = raw_input(colored(prompt, "grey", "bold"))
-    line = preprocess(line + "\n")
+    line = remove_comments(line + "\n")
     return (line, line.count("(") - line.count(")"))
