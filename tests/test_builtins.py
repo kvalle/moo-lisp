@@ -46,10 +46,10 @@ class TestBuiltins:
         """Test different ways to create lists"""
 
         env = get_default_env()
-        xs = [1, 2, "foo", 4]
-        assert_equals(xs, interpret("(quote (1 2 foo 4))", env))
-        assert_equals(xs, interpret("(cons 1 (cons 2 (cons 'foo (cons 4 nil))))", env))
-        assert_equals(xs, interpret("(list 1 2 'foo 4)", env))
+        xs = [1, 2, True, 4]
+        assert_equals(xs, interpret("(quote (1 2 #t 4))", env))
+        assert_equals(xs, interpret("(cons 1 (cons 2 (cons #t (cons 4 nil))))", env))
+        assert_equals(xs, interpret("(list 1 2 #t 4)", env))
 
     def test_deconstruction_of_lists(self):
         """Tests picking elements from lists using car and cdr"""
