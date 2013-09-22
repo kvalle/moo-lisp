@@ -31,8 +31,10 @@ def expand_quote_ticks(source):
 
 def tokenize(source):
     "Create list of tokens from (preprocessed) program source"
-    source = source.replace("(", " ( ").replace(")", " ) ")
-    return source.split()
+    return source.replace("(", " ( ").replace(")", " ) ").split()
+
+def untokenize(tokens):
+    return " ".join(tokens).replace("( ", "(").replace(" )", ")")
 
 def analyze(tokens):
     """Transform list of token to AST
@@ -42,7 +44,7 @@ def analyze(tokens):
     """
     sexp, rest = _read_elem(tokens)
     if len(rest) > 0:
-        raise LispSyntaxError("Expected EOF got %s" % unparse(rest))
+        raise LispSyntaxError("Expected EOF got '%s'" % untokenize(rest))
     return sexp
 
 def _read_elem(tokens):
