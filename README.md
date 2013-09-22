@@ -9,13 +9,14 @@ Oh, and please don't do anything silly like using Moo for production code, or an
 
 ### Usage
 
-To run the repl
+To run the REPL (see an example [here](http://ascii.io/a/5544)):
 
     ./moo
 
-To interpret a file
+To interpret a file:
 
     ./moo example.moo
+
 
 ### Why did I write this thing?
 
