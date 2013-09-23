@@ -20,23 +20,30 @@ def repl():
     print "             REPL      " + faded("        ||----w |    ")
     print "                       " + faded("        ||     ||    ")
     print faded("  use (help) to get help")
+    print faded("  use ^D to exit")
     print
 
     env = get_default_env(interactive=True)
-    try:
-        while True:
-            try:
-                source = read_expression()
-                result = evaluate(parse(source), env)
-                if result is not None: 
-                    print unparse(result)
-            except LispError, e:
-                print colored("! ", "red") + str(e)
-            except (KeyboardInterrupt):
-                msg = "Interupted. " + faded("(Use ^D to exit)")
-                print "\n" + colored("! ", "red") + msg
-    except (EOFError):
-        print faded("\nBye! o/")
+    while True:
+        try:
+            source = read_expression()
+            result = evaluate(parse(source), env)
+            if result is not None: 
+                print unparse(result)
+        except LispError, e:
+            print colored("!", "red"),
+            print faded(str(e.__class__.__name__) + ":"),
+            print str(e)
+        except KeyboardInterrupt:
+            msg = "Interupted. " + faded("(Use ^D to exit)")
+            print "\n" + colored("! ", "red") + msg
+        except EOFError:
+            print faded("\nBye! o/")
+            sys.exit(0)
+        except Exception, e:
+            print colored("! ", "red") + faded("The Python is showing through…")
+            print faded("  " + str(e.__class__.__name__) + ":"),
+            print str(e)
 
 def read_expression():
     "Read from stdin until we have at least one s-expression"
