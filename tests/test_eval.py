@@ -258,3 +258,32 @@ class TestEval:
         # equivalent to evaluate(["quote, ["quote, "foo"]])
         ast = ["eval", ["quote", ["quote", ["quote", "foo"]]]]
         assert_equals(["quote", "foo"], evaluate(ast, Environment()))
+
+    def test_eval_quasiquote_without_unquote(self):
+        assert_equals("foo", evaluate(["quasiquote", "foo"], Environment()))
+        assert_equals(["+", 1, 2], evaluate(["quasiquote", ["+", 1, 2]], Environment()))
+
+    def test_eval_quasiquote_with_top_level_unquote(self):
+        env = Environment({"foo": 42, "bar": 100})
+        ast = ["quasiquote", ["+", ["unquote", "foo"], ["unquote", "bar"]]]
+        assert_equals(["+", 42, 100], evaluate(ast, env))
+
+    def test_eval_quasiquote_with_deeper_unquotes(self):
+        env = Environment({"foo": 42, "bar": 100})
+        ast = ["quasiquote", ["+", ["unquote", "foo"], ["+", 1, ["unquote", "bar"]]]]
+        assert_equals(["+", 42, ["+", 1, 100]], evaluate(ast, env))
+
+    def test_eval_unquote_outside_of_quasiquote_raises_exception(self):
+        """Unquote cannot stand alone, without an *directly enclosing* quasiquote."""
+
+        env = Environment()
+        msg = "Unquote outside of quasiquote: ,foo"
+
+        with assert_raises_regexp(LispSyntaxError, msg):
+            # standalone unquote
+            evaluate(["unquote", "foo"], env)
+
+        with assert_raises_regexp(LispSyntaxError, msg):
+            # unquote within another unquote
+            ast = ["quasiquote", ["unquote", ["unquote", "foo"]]]
+            evaluate(ast, env)

@@ -34,8 +34,12 @@ def evaluate(ast, env):
         return results[-1]
     elif ast[0] == 'quote':
         _assert_exp_length(ast, 2)
-        (_, exp) = ast
-        return exp
+        return ast[1]
+    elif ast[0] == 'quasiquote':
+        _assert_exp_length(ast, 2)
+        return evaluate_unquotes(ast[1], env)
+    elif ast[0] == 'unquote':
+        raise LispSyntaxError("Unquote outside of quasiquote: %s" % unparse(ast))
     elif ast[0] == 'set!':
         _assert_exp_length(ast, 3)
         (_, var, exp) = ast
@@ -56,6 +60,15 @@ def evaluate(ast, env):
             return cls.fn(*args)
         else:
             raise Exception("Unknown implementation of Closure: %s" % cls)
+
+def evaluate_unquotes(ast, env):
+    if not isinstance(ast, list):
+        return ast
+    elif ast[0] == "unquote":
+        _assert_exp_length(ast, 2)
+        return evaluate(ast[1], env)
+    else:
+        return [ast[0]] + [evaluate_unquotes(exp, env) for exp in ast[1:]]
 
 def _assert_exp_length(ast, length):
     if len(ast) > length:
