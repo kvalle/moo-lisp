@@ -15,6 +15,8 @@ quote_ticks = "".join(quotes.keys())
 def unparse(ast):
     if isinstance(ast, bool):
         return "#t" if ast else "#f"
+    elif ast == []:
+        return "()"
     elif isinstance(ast, list):
         if ast[0] in ticks:
             return "%s%s" % (ticks[ast[0]], unparse(ast[1]))

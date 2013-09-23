@@ -33,3 +33,6 @@ class TestUnparsing:
     def test_unparse_quasiquotes_with_unquote(self):
         ast = ["quote", ["quasiquote", ["foo", ["unquote", "bar"]]]]
         assert_equals("'`(foo ,bar)", unparse(ast))
+
+    def test_unparse_empty_list(self):
+        assert_equals("()", unparse([]))

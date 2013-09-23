@@ -19,7 +19,7 @@ def evaluate(ast, env):
         _assert_exp_length(ast, 2)
         (_, exp) = ast
         return evaluate(evaluate(exp, env), env)
-    elif ast[0] == 'define': 
+    elif ast[0] == 'define':
         _assert_valid_definition(ast[1:])
         env[ast[1]] = evaluate(ast[2], env)
     elif ast[0] == 'lambda' or ast[0] == 'λ':
