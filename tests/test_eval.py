@@ -50,11 +50,20 @@ class TestEval:
         evaluate(["define", "x", 1000], env)
         assert_equals(1000, env["x"])
 
-    def test_wrong_define_syntax(self):
+    def test_define_with_wrong_number_of_arguments(self):
+        """Defines should have exactly two arguments, or raise an error"""
+
+        with assert_raises_regexp(LispSyntaxError, "Wrong number of arguments"):
+            evaluate(["define", "x"], Environment())
+
+        with assert_raises_regexp(LispSyntaxError, "Wrong number of arguments"):
+            evaluate(["define", "x", 1, 2], Environment())
+
+    def test_define_with_nonsymbol_as_variable(self):
         """Malformed defines should throw an error"""
 
-        with assert_raises_regexp(LispSyntaxError, "Malformed define"):
-            evaluate(["define", "x"], Environment())
+        with assert_raises_regexp(LispSyntaxError, "non-symbol"):
+            evaluate(["define", True, 42], Environment())
 
     def test_lambda_evaluates_to_lambda_which_is_a_closure(self):
         """The lambda form should evaluate to a lambda object extending closure"""
@@ -287,3 +296,27 @@ class TestEval:
             # unquote within another unquote
             ast = ["quasiquote", ["unquote", ["unquote", "foo"]]]
             evaluate(ast, env)
+
+    def test_simple_let_expression(self):
+        """Let expressions should create a new environment with the new definitions,
+        then evaluate the body with this environment, and not make any changes to 
+        the outer environment"""
+
+        env = Environment({"foo": 1})
+        ast = parse("(let ((foo 2)) foo)")
+        assert_equals(2, evaluate(ast, env))
+        assert_equals(1, env["foo"])
+
+    def test_let_raises_error_on_nonsymbol_as_variable(self):
+        """Attempting to define something other than a symbol as a variable should
+        result in an exception"""
+
+        with assert_raises_regexp(LispSyntaxError, "non-symbol"):
+            evaluate(parse("(let ((#t 1)) 1)"), Environment())
+
+    def test_let_raises_error_wrong_number_of_elements(self):
+        """A variable definition should consist of only two elements,
+        the variable and the value"""
+
+        with assert_raises_regexp(LispSyntaxError, "Wrong number of arguments"):
+            evaluate(parse("(let ((foo 1 2)) foo)"), Environment())

@@ -20,9 +20,8 @@ def evaluate(ast, env):
         (_, exp) = ast
         return evaluate(evaluate(exp, env), env)
     elif ast[0] == 'define': 
-        _assert_exp_length(ast, 3)
-        (_, variable, expression) = ast
-        env[variable] = evaluate(expression, env)
+        _assert_valid_definition(ast[1:])
+        env[ast[1]] = evaluate(ast[2], env)
     elif ast[0] == 'lambda' or ast[0] == 'λ':
         _assert_exp_length(ast, 3)
         (_, params, body) = ast
@@ -44,6 +43,12 @@ def evaluate(ast, env):
         _assert_exp_length(ast, 3)
         (_, var, exp) = ast
         env.defining_env(var)[var] = evaluate(exp, env)
+    elif ast[0] == 'let':
+        _assert_exp_length(ast, 3)
+        for d in ast[1]:
+            _assert_valid_definition(d)
+        defs = [(d[0], evaluate(d[1], env)) for d in ast[1]]
+        return evaluate(ast[2], Environment(defs, env))
     else:
         cls = evaluate(ast[0], env)
         if not isinstance(cls, Closure):
@@ -76,4 +81,12 @@ def _assert_exp_length(ast, length):
         raise LispSyntaxError(msg)
     elif len(ast) < length:
         msg = "Malformed %s, too few arguments: %s" % (ast[0], unparse(ast))
+        raise LispSyntaxError(msg)
+
+def _assert_valid_definition(d):
+    if len(d) != 2:
+        msg = "Wrong number of arguments for variable definition: %s" % d
+        raise LispSyntaxError(msg)
+    elif not isinstance(d[0], str):
+        msg = "Attempted to define non-symbol as variable: %s" % d
         raise LispSyntaxError(msg)
