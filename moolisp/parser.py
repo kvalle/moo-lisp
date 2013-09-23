@@ -25,9 +25,49 @@ def parse(source):
 def remove_comments(source):
     return re.sub(r";.*\n", "\n", source)
 
-def expand_quote_ticks(source):
-    # TODO
+def expand_quoted_symbol(source):
+    match = re.search(r"'([^'\(\s]+)", source)
+    if match:
+        start, end = match.span()
+        source = "%s(quote %s)%s" % (source[:start], match.group(1), source[end:])
     return source
+
+def expand_quoted_list(source):
+    match = re.search(r"'\(", source)
+    if match:
+        start = match.start()
+        end = find_matching_paren(source, start + 1)
+        pre = source[:start]
+        quoted = source[start + 1:end]
+        post = source[end:]
+        # print "> '%s'" % pre
+        # print "> '%s'" % quoted
+        # print "> '%s'" % post
+        source = "%s(quote %s)%s" % (pre, quoted, post)
+    return source
+
+def expand_quote_ticks(source):
+    while "'" in source:
+        source = expand_quoted_symbol(source)
+        source = expand_quoted_list(source)
+    return source
+
+def find_matching_paren(source, start):
+    """Given a string and the index of an opening parenthesis, determine 
+    the index of the matching closing paren"""
+
+    assert source[start] == '('
+    pos = start
+    open_brackets = 1
+    while open_brackets > 0:
+        pos += 1
+        if len(source) == pos:
+            raise LispSyntaxError("Unbalanced expression: %s" % source[start:])
+        if source[pos] == '(':
+            open_brackets += 1
+        if source[pos] == ')':
+            open_brackets -= 1
+    return pos
 
 def tokenize(source):
     "Create list of tokens from (preprocessed) program source"
