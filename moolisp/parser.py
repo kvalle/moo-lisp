@@ -4,12 +4,20 @@ import re
 
 from errors import LispSyntaxError
 
+quotes = {
+    "'": 'quote',
+    "`": 'quasiquote',
+    ",": 'unquote'
+}
+ticks = {quote: tick for tick, quote in quotes.items()}
+quote_ticks = "".join(quotes.keys())
+
 def unparse(ast):
     if isinstance(ast, bool):
         return "#t" if ast else "#f"
     elif isinstance(ast, list):
-        if ast[0] == "quote":
-            return "'%s" % unparse(ast[1])
+        if ast[0] in ticks:
+            return "%s%s" % (ticks[ast[0]], unparse(ast[1]))
         else:
             return "(%s)" % " ".join([unparse(x) for x in ast])
     else:
@@ -26,28 +34,37 @@ def remove_comments(source):
     return re.sub(r";.*\n", "\n", source)
 
 def expand_quoted_symbol(source):
-    match = re.search(r"'([^'\(\s]+)", source)
+    # match anything with a tick (`',) followed by at least one character
+    # that is not whitespace, a paren or another tick
+    regex = r"([%(ticks)s])([^%(ticks)s\(\s]+)" % {"ticks": quote_ticks}
+    match = re.search(regex, source)
     if match:
         start, end = match.span()
-        source = "%s(quote %s)%s" % (source[:start], match.group(1), source[end:])
+        source = "%(pre)s(%(quote)s %(quoted)s)%(post)s" % {
+            "pre": source[:start], 
+            "quote": quotes[match.group(1)], 
+            "quoted": match.group(2), 
+            "post": source[end:]
+        }
     return source
 
 def expand_quoted_list(source):
-    match = re.search(r"'\(", source)
+    # match any tick followed directly by an opening parenthesis
+    regex = r"([%(ticks)s])\(" % {"ticks": quote_ticks}
+    match = re.search(regex, source)
     if match:
         start = match.start()
         end = find_matching_paren(source, start + 1)
-        pre = source[:start]
-        quoted = source[start + 1:end]
-        post = source[end:]
-        # print "> '%s'" % pre
-        # print "> '%s'" % quoted
-        # print "> '%s'" % post
-        source = "%s(quote %s)%s" % (pre, quoted, post)
+        source = "%(pre)s(%(quote)s %(quoted)s)%(post)s" % {
+            "pre": source[:start],
+            "quote": quotes[match.group(1)],
+            "quoted": source[start + 1:end],
+            "post": source[end:] 
+        }
     return source
 
 def expand_quote_ticks(source):
-    while "'" in source:
+    while re.search(r"[%s]" % quote_ticks, source):
         source = expand_quoted_symbol(source)
         source = expand_quoted_list(source)
     return source

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import unittest
 from nose.tools import assert_equals, assert_raises, assert_raises_regexp
 
 from moolisp.parser import parse, unparse, expand_quote_ticks, \
@@ -77,3 +76,37 @@ class TestParsingQuotes:
     def test_nested_quotes_on_lists(self):
         assert_equals(["quote", ["quote", ["foo", "bar"]]], parse("''(foo bar)"))
 
+    ## Tests for expanding quasiquote and unquote
+    
+    def test_expand_quasiquoted_symbol(self):
+        assert_equals("(quasiquote foo)", expand_quote_ticks("`foo"))
+        assert_equals("(quasiquote +)", expand_quote_ticks("`+"))
+        assert_equals("(quasiquote #f)", expand_quote_ticks("`#f"))
+
+    def test_expand_quasiquoted_list(self):
+        assert_equals("(quasiquote (+ 1 2))", expand_quote_ticks("`(+ 1 2)"))
+
+    def test_nested_quasiquotes(self):
+        assert_equals("(quasiquote (quasiquote (quasiquote foo)))",
+            expand_quote_ticks("```foo"))
+        assert_equals("(quasiquote (quasiquote (quasiquote (+ 1 2))))",
+            expand_quote_ticks("```(+ 1 2)"))
+
+    def test_expand_unquoted_symbol(self):
+        assert_equals("(unquote foo)", expand_quote_ticks(",foo"))
+        assert_equals("(unquote +)", expand_quote_ticks(",+"))
+        assert_equals("(unquote #f)", expand_quote_ticks(",#f"))
+
+    def test_expand_unquoted_list(self):
+        assert_equals("(unquote (+ 1 2))", expand_quote_ticks(",(+ 1 2)"))
+
+    def test_quasiqute_with_unquote(self):
+        assert_equals("(quasiquote (+ (unquote foo) (unquote bar) 42))", 
+            expand_quote_ticks("`(+ ,foo ,bar 42)"))
+
+    def test_expand_quote_combinations(self):
+        assert_equals("(quasiquote (quote (unquote foo)))", expand_quote_ticks("`',foo"))
+
+    def test_expand_crazy_quote_combo(self):
+        source = "`(this ,,'`(makes ,no) 'sense)"
+        assert_equals(source, unparse(parse(source)))
