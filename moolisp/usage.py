@@ -23,6 +23,8 @@ default = """
     begin       → (begin <exp> [<exp> ...])     
     quote       → (quote <exp>)     
                 → '<exp>
+    quasiquote  → (quasiquote <exp>)
+                → `<exp>
     eval        → (eval <exp>)
 
     for more details:
@@ -70,6 +72,21 @@ usage = {
       Evaluates to a function closure created from the function 
       with the (zero or more) named <parameter>s, and <exp> as 
       the body.
+""", "let": """
+  let
+
+      → (let ([<def> ...]) <body>)  
+
+      Let defines a new environment with zero or more new variables
+      are defined. Each <def> consist of a list (<var> <exp>). The 
+      <exp>s are evaluated in the current environment, then assigned 
+      to the corresponding <var>s as variables in the new  environment.
+      
+      Should <var> already be defined in the outer environment, a new
+      variable will shadow it in the new environment.
+
+      The <body> expression is finally evaluated in the new environment, 
+      and the let expression evaluates to its value.
 """, "begin": """
   begin
 
@@ -78,12 +95,35 @@ usage = {
       Evaluates the expressions in order. Returns the value of 
       the final expression evaluated.
 """, "quote": """
-  quoting
+  quote
 
       → (quote <exp>)
       → '<exp>
 
       Returns <exp> without evaluating it.
+
+      See also: quasiquote
+""", "quasiquote": """
+  quasiquote
+
+      → (quasiquote <exp>)
+      → `<exp>
+
+      Returns <exp> without evaluating it, just like quote. However,
+      any unquoted expressions within <exp> are evaluated first.
+
+      See also: unquote
+""", "unquote": """
+  unquote
+
+      → (unquote <exp>)
+      → ,<exp>
+
+      When used within a quasiquote form, will evaluate <exp> before
+      passing it on to quasiquote. Must only be used within a 
+      quasiquote.
+
+      See also: quasiquote
 """, "eval": """
   eval
 
@@ -95,6 +135,8 @@ usage = {
 
       The eval and quote forms may be seen as opposites, in that
       (eval (quote <exp>)) == <exp>
+
+      See also: quote, quasiquote
 """    
 }
 
