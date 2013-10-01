@@ -2,24 +2,22 @@
 
 from nose.tools import assert_equals, assert_raises_regexp
 
-from moolisp.parser import tokenize, parse
+from moolisp.parser import parse
 from moolisp.errors import LispSyntaxError
 
 class TestParsing:
 
-    def test_tokenize_single_atom(self):
-        assert_equals(['foo'], tokenize('foo'))
+    def test_parse_single_atom(self):
+        assert_equals('foo', parse('foo'))
 
-    def test_tokenize_list(self):
-        source = '(foo 1 2)'
-        tokens = ['(', 'foo', '1', '2', ')']
-        assert_equals(tokens, tokenize(source))
+    def test_parse_list_of_symbols(self):
+        assert_equals(['foo', 'bar', 'baz'], parse('(foo bar baz)'))
 
     def test_parse_on_simple_list(self):
         program = '(foo bar)'
         assert_equals(['foo', 'bar'], parse(program))
 
-    def test_parse_on_tested_list(self):
+    def test_parse_on_nested_list(self):
         program = '(foo (bar x y) (baz x))'
         ast = ['foo', 
                 ['bar', 'x', 'y'], 
@@ -27,7 +25,7 @@ class TestParsing:
         assert_equals(ast, parse(program))
 
     def test_parse_exception_missing_paren(self):
-        with assert_raises_regexp(LispSyntaxError, 'Unexpected EOF'):
+        with assert_raises_regexp(LispSyntaxError, 'Unbalanced expression'):
             parse('(foo (bar x y)')
 
     def test_parse_exception_extra_paren(self):

@@ -2,8 +2,7 @@
 
 from nose.tools import assert_equals, assert_raises, assert_raises_regexp
 
-from moolisp.parser import parse, unparse, expand_quote_ticks, \
-    find_matching_paren, expand_quoted_symbol, expand_quoted_list
+from moolisp.parser import parse, unparse, find_matching_paren
 from moolisp.errors import LispSyntaxError
 
 class TestParsingQuotes:
@@ -31,20 +30,20 @@ class TestParsingQuotes:
         with assert_raises_regexp(LispSyntaxError, "Unbalanced expression"):
             find_matching_paren("string (without closing paren", 7)
 
-    ## Tests for expanding quoted symbols
+    ## Tests for expanding quoted symbols correctly
 
     def test_expand_single_quoted_symbol(self):
-        assert_equals("(foo (quote bar))", expand_quoted_symbol("(foo 'bar)"))
-        assert_equals("(foo (quote #t))", expand_quoted_symbol("(foo '#t)"))
-        assert_equals("(foo (quote +))", expand_quoted_symbol("(foo '+)"))
+        assert_equals(["foo", ["quote", "bar"]], parse("(foo 'bar)"))
+        assert_equals(["foo", ["quote", True]], parse("(foo '#t)"))
+        assert_equals(["foo", ["quote", '+']], parse("(foo '+)"))
 
     def test_expand_quoted_symbol_dont_touch_nested_quote_on_list(self):
         source = "(foo ''(bar))"
-        assert_equals(source, expand_quoted_symbol(source))
+        assert_equals(source, unparse(parse(source)))
 
     def test_expand_quotes_with_only_symbols(self):
-        assert_equals("(quote foo)", expand_quote_ticks("'foo"))
-        assert_equals("(quote (quote (quote foo)))", expand_quote_ticks("'''foo"))
+        assert_equals(["quote", "foo"], parse("'foo"))
+        assert_equals(["quote", ["quote", ["quote", "foo"]]], parse("'''foo"))
 
     def test_parse_quote_tick_on_symbol(self):
         assert_equals(["quote", "foo"], parse("'foo"))
@@ -61,13 +60,13 @@ class TestParsingQuotes:
     ## Tests for expanding quoted lists
 
     def test_expand_single_quoted_list(self):
-        assert_equals("(foo (quote (+ 1 2)))", expand_quoted_list("(foo '(+ 1 2))"))
-        assert_equals("(foo (quote (#t #f)))", expand_quoted_list("(foo '(#t #f))"))
+        assert_equals(["foo", ["quote", ["+", 1, 2]]], parse("(foo '(+ 1 2))"))
+        assert_equals(["foo", ["quote", [True, False]]], parse("(foo '(#t #f))"))
 
     def test_expand_quotes_with_lists(self):
-        assert_equals("(quote (foo bar))", expand_quote_ticks("'(foo bar)"))
-        assert_equals("(quote (quote (quote (foo bar))))", 
-            expand_quote_ticks("'''(foo bar)"))
+        assert_equals(["quote", ["foo", "bar"]], parse("'(foo bar)"))
+        assert_equals(["quote", ["quote", ["quote", ["foo", "bar"]]]],
+            parse("'''(foo bar)"))
 
     def test_parse_quote_tick_on_list(self):
         assert_equals(["quote", ["foo", "bar"]], parse("'(foo bar)"))
@@ -79,33 +78,34 @@ class TestParsingQuotes:
     ## Tests for expanding quasiquote and unquote
     
     def test_expand_quasiquoted_symbol(self):
-        assert_equals("(quasiquote foo)", expand_quote_ticks("`foo"))
-        assert_equals("(quasiquote +)", expand_quote_ticks("`+"))
-        assert_equals("(quasiquote #f)", expand_quote_ticks("`#f"))
+        assert_equals(["quasiquote", "foo"], parse("`foo"))
+        assert_equals(["quasiquote", "+"], parse("`+"))
+        assert_equals(["quasiquote", False], parse("`#f"))
 
     def test_expand_quasiquoted_list(self):
-        assert_equals("(quasiquote (+ 1 2))", expand_quote_ticks("`(+ 1 2)"))
+        assert_equals(["quasiquote", ["+", 1, 2]], parse("`(+ 1 2)"))
 
     def test_nested_quasiquotes(self):
-        assert_equals("(quasiquote (quasiquote (quasiquote foo)))",
-            expand_quote_ticks("```foo"))
-        assert_equals("(quasiquote (quasiquote (quasiquote (+ 1 2))))",
-            expand_quote_ticks("```(+ 1 2)"))
+        assert_equals(["quasiquote", ["quasiquote", ["quasiquote", "foo"]]],
+            parse("```foo"))
+        assert_equals(["quasiquote", ["quasiquote", ["quasiquote", ["+", 1, 2]]]],
+            parse("```(+ 1 2)"))
 
     def test_expand_unquoted_symbol(self):
-        assert_equals("(unquote foo)", expand_quote_ticks(",foo"))
-        assert_equals("(unquote +)", expand_quote_ticks(",+"))
-        assert_equals("(unquote #f)", expand_quote_ticks(",#f"))
+        assert_equals(["unquote", "foo"], parse(",foo"))
+        assert_equals(["unquote", "+"], parse(",+"))
+        assert_equals(["unquote", False], parse(",#f"))
 
     def test_expand_unquoted_list(self):
-        assert_equals("(unquote (+ 1 2))", expand_quote_ticks(",(+ 1 2)"))
+        assert_equals(["unquote", ["+", 1, 2]], parse(",(+ 1 2)"))
 
     def test_quasiqute_with_unquote(self):
-        assert_equals("(quasiquote (+ (unquote foo) (unquote bar) 42))", 
-            expand_quote_ticks("`(+ ,foo ,bar 42)"))
+        assert_equals(["quasiquote", ["+", ["unquote", "foo"], ["unquote", "bar"], 42]],
+            parse("`(+ ,foo ,bar 42)"))
 
     def test_expand_quote_combinations(self):
-        assert_equals("(quasiquote (quote (unquote foo)))", expand_quote_ticks("`',foo"))
+        assert_equals(["quasiquote", ["quote", ["unquote", "foo"]]],
+            parse("`',foo"))
 
     def test_expand_crazy_quote_combo(self):
         source = "`(this ,,'`(makes ,no) 'sense)"

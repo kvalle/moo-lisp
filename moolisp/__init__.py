@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['repl', 'parse_file', 'interpret', 'tokenize', 'parse', 'evaluate']
+__all__ = ['repl', 'parse_file', 'interpret', 'parse', 'evaluate']
 
 import sys
 from evaluator import evaluate
-from parser import tokenize, parse, unparse
+from parser import parse, unparse
 from repl import repl
 from errors import LispError
 from env import get_default_env
