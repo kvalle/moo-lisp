@@ -19,7 +19,7 @@ def unparse(ast):
         else:
             return "(%s)" % " ".join([unparse(x) for x in ast])
     else:
-        return str(ast) # string, integer or Closure
+        return str(ast)  # string, integer or Closure
 
 def parse(source):
     """Parse string representation of one single expression

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import sys
 from errors import LispError
 from colors import colored, faded
 from env import get_default_env
