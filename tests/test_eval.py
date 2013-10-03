@@ -37,6 +37,15 @@ class TestEval:
         env = Environment({"pred": False, "else": 42})
         assert_equals(42, evaluate(ast, env))
 
+    def test_atom(self):
+        env = Environment()
+        assert_equals(True, evaluate(["atom", True], env))
+        assert_equals(True, evaluate(["atom", False], env))
+        assert_equals(True, evaluate(["atom", 42], env))
+        assert_equals(True, evaluate(["atom", "foo"], Environment({"foo": "bar"})))
+        assert_equals(False, evaluate(["atom", "foo"], Environment({"foo": ["bar"]})))
+        assert_equals(False, evaluate(["atom", ["quote", ["foo", "bar"]]], env))
+
     def test_wrong_if_syntax(self):
         """Test evaluating if expression with too many parts"""
 

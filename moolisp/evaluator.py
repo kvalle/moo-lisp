@@ -5,12 +5,20 @@ from env import Environment
 from types import Closure, Lambda, Builtin 
 from parser import unparse
 
+def is_atom(x):
+    return isinstance(x, int) \
+        or isinstance(x, str) \
+        or isinstance(x, bool)
+
 def evaluate(ast, env):
     """Evaluate an Abstract Syntax Tree in the specified environment."""
     if isinstance(ast, str): 
         return env[ast]
+    elif is_atom(ast):
+        return ast
     elif isinstance(ast, list):
         if ast[0] == 'if': return _if(ast, env)
+        elif ast[0] == 'atom': return _atom(ast, env)
         elif ast[0] == 'eval': return _eval(ast, env)
         elif ast[0] == 'define': return _define(ast, env)
         elif ast[0] in ('lambda', 'λ'): return _lambda(ast, env)
@@ -20,12 +28,16 @@ def evaluate(ast, env):
         elif ast[0] == 'let': return _let(ast, env)
         else: return _apply(ast, env)
     else:
-        return ast
+        raise LispSyntaxError(ast)
 
 def _if(ast, env):
     _assert_exp_length(ast, 4)
     (_, pred, then_exp, else_exp) = ast
     return evaluate((then_exp if evaluate(pred, env) else else_exp), env)
+
+def _atom(ast, env):
+    arg = evaluate(ast[1], env)
+    return is_atom(arg)
 
 def _eval(ast, env):
     _assert_exp_length(ast, 2)
