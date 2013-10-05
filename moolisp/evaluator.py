@@ -26,9 +26,15 @@ def evaluate(ast, env):
         if ast[0] in ('quote', 'unquote', 'quasiquote'): return _quote(ast, env)
         elif ast[0] == 'set!': return _set(ast, env)
         elif ast[0] == 'let': return _let(ast, env)
+        elif ast[0] == 'cond': return _cond(ast, env)
         else: return _apply(ast, env)
     else:
         raise LispSyntaxError(ast)
+
+def _cond(ast, env):
+    for predicate, ast in ast[1:]:
+        if evaluate(predicate, env) is True:
+            return evaluate(ast, env)
 
 def _if(ast, env):
     _assert_exp_length(ast, 4)
@@ -60,20 +66,20 @@ def _begin(ast, env):
     return results[-1]
 
 def _quote(ast, env):
-    def evaluate_unquotes(ast, env):
+    def quasiquote(ast, env):
         if not isinstance(ast, list):
             return ast
         elif ast[0] == "unquote":
             _assert_exp_length(ast, 2)
             return evaluate(ast[1], env)
         else:
-            return [ast[0]] + [evaluate_unquotes(exp, env) for exp in ast[1:]]
+            return [ast[0]] + [quasiquote(exp, env) for exp in ast[1:]]
 
     _assert_exp_length(ast, 2)
     if ast[0] == 'quote':
         return ast[1]
     elif ast[0] == 'quasiquote':
-        return evaluate_unquotes(ast[1], env)
+        return quasiquote(ast[1], env)
     elif ast[0] == 'unquote':
         raise LispSyntaxError("Unquote outside of quasiquote: %s" % unparse(ast))
 

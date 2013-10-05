@@ -30,13 +30,6 @@ class TestEval:
         ast = ["if", True, 42, 1000]
         assert_equals(42, evaluate(ast, Environment()))
 
-    def test_if_with_variable_lookup(self):
-        """Test evaluation of expressions (variable lookup) within if form"""
-
-        ast = ["if", "pred", "then", "else"]
-        env = Environment({"pred": False, "else": 42})
-        assert_equals(42, evaluate(ast, env))
-
     def test_atom(self):
         env = Environment()
         assert_equals(True, evaluate(["atom", True], env))
@@ -329,3 +322,22 @@ class TestEval:
 
         with assert_raises_regexp(LispSyntaxError, "Wrong number of arguments"):
             evaluate(parse("(let ((foo 1 2)) foo)"), Environment())
+
+    def test_cond(self):
+        program = """
+            (cond (#f 1)
+                  ((atom '(1 2 3)) 2)
+                  ((atom 'foo) 3)
+                  (#t 4))
+        """
+        assert_equals(3, evaluate(parse(program), Environment()))
+
+    def test_simple_if(self):
+        assert_equals(42, evaluate(["if", True, 42, "dosn't-matter"], Environment()))
+
+    def test_if_with_variable_lookup(self):
+        """Test evaluation of expressions (variable lookup) within if form"""
+
+        ast = ["if", "pred", "then", "else"]
+        env = Environment({"pred": False, "else": 42})
+        assert_equals(42, evaluate(ast, env))
