@@ -2,6 +2,42 @@
 
 from inspect import getargspec
 
+## functions for working with types
+
+def tag(tag, value):
+    return ("type", tag, value)
+
+def is_type(t):
+    return isinstance(t, tuple) \
+       and len(t) == 3 \
+       and t[0] == "type"
+
+def type_of(x):
+    if not is_type(x):
+        raise Error("Type of non-type: %s" % x)
+    return x[1]
+
+def value_of(x):
+    if not is_type(x):
+        raise Error("Value of non-type: %s" % x)
+    return x[2]
+
+## helper functions for built in types
+
+def boolean(x):
+    return tag('bool', x)
+    
+true = boolean(True)
+false = boolean(False)
+
+def integer(x):
+    return tag('int', x)
+
+def symbol(x):
+    return tag('symbol', x)
+
+## function helper classes
+
 class Closure:
     "Abstract base type for builtins and lambdas"
     pass

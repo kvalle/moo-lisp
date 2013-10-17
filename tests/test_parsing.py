@@ -2,6 +2,7 @@
 
 from nose.tools import assert_equals, assert_raises_regexp
 
+from moolisp.types import true, false
 from moolisp.parser import parse
 from moolisp.errors import LispSyntaxError
 
@@ -34,7 +35,7 @@ class TestParsing:
 
     def test_parse_with_types(self):
         program = '(if #f (* 42 x) 100)'
-        ast = ['if', False, ['*', 42, 'x'], 100]
+        ast = ['if', false, ['*', 42, 'x'], 100]
         assert_equals(ast, parse(program))
 
     def test_parse_comments(self):
@@ -46,5 +47,5 @@ class TestParsing:
                 42 ; inline comment!
                 (something else)))
         """
-        expected_ast = ['define', 'variable', ['if', True, 42, ['something', 'else']]]
+        expected_ast = ['define', 'variable', ['if', true, 42, ['something', 'else']]]
         assert_equals(expected_ast, parse(program))

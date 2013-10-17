@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+from types import boolean
 from errors import LispSyntaxError
 
 quote_names = {
@@ -38,9 +39,9 @@ def parse(source):
 
 def atomize(elem):
     if elem == "#f":
-        return False
+        return boolean(False)
     elif elem == "#t":
-        return True
+        return boolean(True)
     elif elem.isdigit():
         return int(elem)
     else: 

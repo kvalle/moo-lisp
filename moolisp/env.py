@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from errors import LispNamingError
-from types import Builtin
+from types import Builtin, boolean
 import operator as op
 
 class Environment(dict):
@@ -30,11 +30,11 @@ def get_default_env(interactive=False):
         '/': Builtin(op.div),
         'mod': Builtin(lambda x, y: x % y),
 
-        '=': Builtin(op.eq), 
-        '>': Builtin(op.gt), 
-        '<': Builtin(op.lt), 
-        '>=': Builtin(op.ge), 
-        '<=': Builtin(op.le),
+        '=': Builtin(lambda x, y: boolean(x == y)), 
+        '>': Builtin(lambda x, y: boolean(x > y)), 
+        '<': Builtin(lambda x, y: boolean(x < y)), 
+        '>=': Builtin(lambda x, y: boolean(x >= y)), 
+        '<=': Builtin(lambda x, y: boolean(x <= y)),
 
         'nil': [],
         'cons': Builtin(lambda h, rest: [h] + rest),

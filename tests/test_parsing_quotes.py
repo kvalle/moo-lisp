@@ -2,6 +2,7 @@
 
 from nose.tools import assert_equals, assert_raises, assert_raises_regexp
 
+from moolisp.types import true, false
 from moolisp.parser import parse, unparse, find_matching_paren
 from moolisp.errors import LispSyntaxError
 
@@ -34,7 +35,7 @@ class TestParsingQuotes:
 
     def test_expand_single_quoted_symbol(self):
         assert_equals(["foo", ["quote", "bar"]], parse("(foo 'bar)"))
-        assert_equals(["foo", ["quote", True]], parse("(foo '#t)"))
+        assert_equals(["foo", ["quote", true]], parse("(foo '#t)"))
         assert_equals(["foo", ["quote", '+']], parse("(foo '+)"))
 
     def test_expand_quoted_symbol_dont_touch_nested_quote_on_list(self):
@@ -51,7 +52,7 @@ class TestParsingQuotes:
 
     def test_parse_quote_tick_on_atom(self):
         assert_equals(["quote", 1], parse("'1"))
-        assert_equals(["quote", True], parse("'#t"))
+        assert_equals(["quote", true], parse("'#t"))
 
     def test_nested_quotes(self):
         assert_equals(["quote", ["quote", "foo"]], parse("''foo"))
@@ -61,7 +62,7 @@ class TestParsingQuotes:
 
     def test_expand_single_quoted_list(self):
         assert_equals(["foo", ["quote", ["+", 1, 2]]], parse("(foo '(+ 1 2))"))
-        assert_equals(["foo", ["quote", [True, False]]], parse("(foo '(#t #f))"))
+        assert_equals(["foo", ["quote", [true, false]]], parse("(foo '(#t #f))"))
 
     def test_expand_quotes_with_lists(self):
         assert_equals(["quote", ["foo", "bar"]], parse("'(foo bar)"))
@@ -80,7 +81,7 @@ class TestParsingQuotes:
     def test_expand_quasiquoted_symbol(self):
         assert_equals(["quasiquote", "foo"], parse("`foo"))
         assert_equals(["quasiquote", "+"], parse("`+"))
-        assert_equals(["quasiquote", False], parse("`#f"))
+        assert_equals(["quasiquote", false], parse("`#f"))
 
     def test_expand_quasiquoted_list(self):
         assert_equals(["quasiquote", ["+", 1, 2]], parse("`(+ 1 2)"))
@@ -94,7 +95,7 @@ class TestParsingQuotes:
     def test_expand_unquoted_symbol(self):
         assert_equals(["unquote", "foo"], parse(",foo"))
         assert_equals(["unquote", "+"], parse(",+"))
-        assert_equals(["unquote", False], parse(",#f"))
+        assert_equals(["unquote", false], parse(",#f"))
 
     def test_expand_unquoted_list(self):
         assert_equals(["unquote", ["+", 1, 2]], parse(",(+ 1 2)"))

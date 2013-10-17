@@ -2,6 +2,7 @@
 
 from nose.tools import assert_equals, assert_true, assert_false
 
+from moolisp.types import tag
 from moolisp import interpret
 from moolisp.env import get_default_env
 
@@ -21,19 +22,21 @@ class TestBuiltins:
         """Sanity check for the builtin comparators"""
 
         env = get_default_env()
-        assert_true(interpret('(= 2 2)', env))
-        assert_false(interpret('(= 2 3)', env))
-        assert_true(interpret('(= #t #t)', env))
-        assert_false(interpret('(> 1 2)', env))
-        assert_true(interpret('(> 2 1)', env))
-        assert_true(interpret('(< 1 2)', env))
-        assert_false(interpret('(< 2 1)', env))
-        assert_true(interpret('(>= 2 1)', env))
-        assert_true(interpret('(>= 2 2)', env))
-        assert_false(interpret('(>= 2 3)', env))
-        assert_false(interpret('(<= 2 1)', env))
-        assert_true(interpret('(<= 2 2)', env))
-        assert_true(interpret('(<= 2 3)', env))
+        true = tag('bool', True)
+        false = tag('bool', False)
+        assert_equals(true, interpret('(= 2 2)', env))
+        assert_equals(false, interpret('(= 2 3)', env))
+        assert_equals(true, interpret('(= #t #t)', env))
+        assert_equals(false, interpret('(> 1 2)', env))
+        assert_equals(true, interpret('(> 2 1)', env))
+        assert_equals(true, interpret('(< 1 2)', env))
+        assert_equals(false, interpret('(< 2 1)', env))
+        assert_equals(true, interpret('(>= 2 1)', env))
+        assert_equals(true, interpret('(>= 2 2)', env))
+        assert_equals(false, interpret('(>= 2 3)', env))
+        assert_equals(false, interpret('(<= 2 1)', env))
+        assert_equals(true, interpret('(<= 2 2)', env))
+        assert_equals(true, interpret('(<= 2 3)', env))
 
     def test_list_nil(self):
         """Test the predefined nil value"""
@@ -46,7 +49,7 @@ class TestBuiltins:
         """Test different ways to create lists"""
 
         env = get_default_env()
-        xs = [1, 2, True, 4]
+        xs = [1, 2, tag('bool', True), 4]
         assert_equals(xs, interpret("(quote (1 2 #t 4))", env))
         assert_equals(xs, interpret("(cons 1 (cons 2 (cons #t (cons 4 nil))))", env))
         assert_equals(xs, interpret("(list 1 2 #t 4)", env))
