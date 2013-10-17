@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
-from types import boolean
+from types import boolean, is_boolean, value_of
 from errors import LispSyntaxError
 
 quote_names = {
@@ -12,8 +12,8 @@ quote_names = {
 quote_ticks = dict((tick, name) for name, tick in quote_names.iteritems())
 
 def unparse(ast):
-    if isinstance(ast, bool):
-        return "#t" if ast else "#f"
+    if is_boolean(ast):
+        return "#t" if value_of(ast) else "#f"
     elif isinstance(ast, list):
         if len(ast) > 0 and ast[0] in quote_names:
             return "%s%s" % (quote_names[ast[0]], unparse(ast[1]))

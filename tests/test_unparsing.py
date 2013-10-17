@@ -2,6 +2,7 @@
 
 from nose.tools import assert_equals
 
+from moolisp.types import boolean
 from moolisp.parser import unparse
 
 class TestUnparsing:
@@ -9,8 +10,8 @@ class TestUnparsing:
     Abstract Syntax Tree (AST) and produces Moo lisp syntax"""
 
     def test_unparse_bool(self):
-        assert_equals("#t", unparse(True))
-        assert_equals("#f", unparse(False))
+        assert_equals("#t", unparse(boolean(True)))
+        assert_equals("#f", unparse(boolean(False)))
 
     def test_unparse_int(self):
         assert_equals("1", unparse(1))
@@ -24,7 +25,7 @@ class TestUnparsing:
 
     def test_unparse_list(self):
         assert_equals("(1 2 3)", unparse([1, 2, 3]))
-        assert_equals("(if #t 42 #f)", unparse(["if", True, 42, False]))
+        assert_equals("(if #t 42 #f)", unparse(["if", boolean(True), 42, boolean(False)]))
 
     def test_unparse_quotes(self):
         assert_equals("'foo", unparse(["quote", "foo"]))

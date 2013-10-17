@@ -2,16 +2,13 @@
 
 from errors import LispSyntaxError, LispTypeError
 from env import Environment
-from types import Closure, Lambda, Builtin, is_type, type_of, value_of, boolean
+from types import Closure, Lambda, Builtin, is_type, type_of, value_of, boolean, is_boolean
 from parser import unparse
 
 def is_atom(x):
     return isinstance(x, int) \
         or isinstance(x, str) \
-        or is_bool(x)
-
-def is_bool(b):
-    return is_type(b) and type_of(b) == "bool"
+        or is_boolean(x)
 
 def evaluate(ast, env):
     """Evaluate an Abstract Syntax Tree in the specified environment."""
@@ -136,7 +133,7 @@ def _assert_valid_definition(d):
         raise LispSyntaxError(msg)
 
 def _assert_boolean(p, exp=None):
-    if not is_bool(p):
+    if not is_boolean(p):
         msg = "Boolean required, got '%s'. " % unparse(p)
         if exp is not None:
             msg += "Offending expression: %s" % unparse(exp)

@@ -30,6 +30,9 @@ def boolean(x):
 true = boolean(True)
 false = boolean(False)
 
+def is_boolean(b):
+    return is_type(b) and type_of(b) == "bool"
+
 def integer(x):
     return tag('int', x)
 
