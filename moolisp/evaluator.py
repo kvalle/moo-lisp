@@ -12,10 +12,8 @@ def is_atom(x):
 
 def evaluate(ast, env):
     """Evaluate an Abstract Syntax Tree in the specified environment."""
-    if isinstance(ast, str): 
-        return env[ast]
-    elif is_atom(ast):
-        return ast
+    if isinstance(ast, str): return env[ast]
+    elif is_atom(ast): return ast
     elif isinstance(ast, list):
         if ast[0] == 'if': return _if(ast, env)
         elif ast[0] == 'atom': return _atom(ast, env)
@@ -23,7 +21,7 @@ def evaluate(ast, env):
         elif ast[0] == 'define': return _define(ast, env)
         elif ast[0] in ('lambda', 'λ'): return _lambda(ast, env)
         elif ast[0] == 'begin': return _begin(ast, env)
-        if ast[0] in ('quote', 'unquote', 'quasiquote'): return _quote(ast, env)
+        elif ast[0] in ('quote', 'unquote', 'quasiquote'): return _quote(ast, env)
         elif ast[0] == 'set!': return _set(ast, env)
         elif ast[0] == 'let': return _let(ast, env)
         elif ast[0] == 'cond': return _cond(ast, env)
