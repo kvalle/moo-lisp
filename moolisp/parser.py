@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
-from types import boolean, is_boolean, value_of
+from types import boolean, is_boolean, integer, is_integer, value_of
 from errors import LispSyntaxError
 
 quote_names = {
@@ -14,6 +14,8 @@ quote_ticks = dict((tick, name) for name, tick in quote_names.iteritems())
 def unparse(ast):
     if is_boolean(ast):
         return "#t" if value_of(ast) else "#f"
+    elif is_integer(ast):
+        return str(value_of(ast))
     elif isinstance(ast, list):
         if len(ast) > 0 and ast[0] in quote_names:
             return "%s%s" % (quote_names[ast[0]], unparse(ast[1]))
@@ -43,7 +45,7 @@ def atomize(elem):
     elif elem == "#t":
         return boolean(True)
     elif elem.isdigit():
-        return int(elem)
+        return integer(int(elem))
     else: 
         return elem  # symbols or lists
 

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from errors import LispNamingError
-from types import Builtin, boolean
-import operator as op
+from types import Builtin, boolean, integer, value_of
 
 class Environment(dict):
     def __init__(self, vars=None, outer=None):
@@ -24,11 +23,11 @@ class Environment(dict):
 
 def get_default_env(interactive=False):
     env = Environment({
-        '+': Builtin(op.add),
-        '-': Builtin(op.sub),
-        '*': Builtin(op.mul),
-        '/': Builtin(op.div),
-        'mod': Builtin(lambda x, y: x % y),
+        '+': Builtin(lambda x, y: integer(value_of(x) + value_of(y))),
+        '-': Builtin(lambda x, y: integer(value_of(x) - value_of(y))),
+        '*': Builtin(lambda x, y: integer(value_of(x) * value_of(y))),
+        '/': Builtin(lambda x, y: integer(value_of(x) / value_of(y))),
+        'mod': Builtin(lambda x, y: integer(value_of(x) % value_of(y))),
 
         '=': Builtin(lambda x, y: boolean(x == y)), 
         '>': Builtin(lambda x, y: boolean(x > y)), 

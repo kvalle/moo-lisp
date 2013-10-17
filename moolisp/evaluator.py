@@ -2,11 +2,12 @@
 
 from errors import LispSyntaxError, LispTypeError
 from env import Environment
-from types import Closure, Lambda, Builtin, is_type, type_of, value_of, boolean, is_boolean
+from types import Closure, Lambda, Builtin, \
+    is_type, type_of, value_of, boolean, is_boolean, integer, is_integer
 from parser import unparse
 
 def is_atom(x):
-    return isinstance(x, int) \
+    return is_integer(x) \
         or isinstance(x, str) \
         or is_boolean(x)
 

@@ -30,11 +30,14 @@ def boolean(x):
 true = boolean(True)
 false = boolean(False)
 
-def is_boolean(b):
-    return is_type(b) and type_of(b) == "bool"
+def is_boolean(x):
+    return is_type(x) and type_of(x) == 'bool'
 
 def integer(x):
     return tag('int', x)
+
+def is_integer(x):
+    return is_type(x) and type_of(x) == 'int'
 
 def symbol(x):
     return tag('symbol', x)
