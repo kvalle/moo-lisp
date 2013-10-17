@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from nose.tools import assert_equals, assert_true, assert_false
+from nose.tools import assert_equals
 
-from moolisp.types import tag, integer, true, false
+from moolisp.types import integer, true, false
 from moolisp import interpret
 from moolisp.env import get_default_env
 
@@ -59,5 +59,5 @@ class TestBuiltins:
         interpret("(define lst (list 1 2 3 4 5))", env)
         assert_equals(integer(1), interpret("(car lst)", env))
         assert_equals(integer(2), interpret("(car (cdr lst))", env))
-        assert_equals([integer(3), integer(4), integer(5)], \
+        assert_equals([integer(3), integer(4), integer(5)],
             interpret("(cdr (cdr lst))", env))

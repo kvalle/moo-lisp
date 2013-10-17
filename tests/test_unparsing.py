@@ -25,12 +25,13 @@ class TestUnparsing:
 
     def test_unparse_list(self):
         assert_equals("(1 2 3)", unparse([integer(1), integer(2), integer(3)]))
-        assert_equals("(if #t 42 #f)", \
+        assert_equals("(if #t 42 #f)",
             unparse(["if", boolean(True), integer(42), boolean(False)]))
 
     def test_unparse_quotes(self):
         assert_equals("'foo", unparse(["quote", "foo"]))
-        assert_equals("'(1 2 3)", unparse(["quote", [integer(1), integer(2), integer(3)]]))
+        assert_equals("'(1 2 3)", 
+            unparse(["quote", [integer(1), integer(2), integer(3)]]))
 
     def test_unparse_quasiquotes_with_unquote(self):
         ast = ["quote", ["quasiquote", ["foo", ["unquote", "bar"]]]]

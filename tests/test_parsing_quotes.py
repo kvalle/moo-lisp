@@ -42,7 +42,7 @@ class TestParsingQuotes:
         source = "(foo ''(bar))"
         assert_equals(source, unparse(parse(source)))
 
-    def test_expand_quotes_with_only_symbols(self):
+    def test_expand_quotes_with_only_symbols(self): 
         assert_equals(["quote", "foo"], parse("'foo"))
         assert_equals(["quote", ["quote", ["quote", "foo"]]], parse("'''foo"))
 
@@ -61,7 +61,8 @@ class TestParsingQuotes:
     ## Tests for expanding quoted lists
 
     def test_expand_single_quoted_list(self):
-        assert_equals(["foo", ["quote", ["+", integer(1), integer(2)]]], parse("(foo '(+ 1 2))"))
+        assert_equals(["foo", ["quote", ["+", integer(1), integer(2)]]], 
+            parse("(foo '(+ 1 2))"))
         assert_equals(["foo", ["quote", [true, false]]], parse("(foo '(#t #f))"))
 
     def test_expand_quotes_with_lists(self):
@@ -89,7 +90,9 @@ class TestParsingQuotes:
     def test_nested_quasiquotes(self):
         assert_equals(["quasiquote", ["quasiquote", ["quasiquote", "foo"]]],
             parse("```foo"))
-        assert_equals(["quasiquote", ["quasiquote", ["quasiquote", ["+", integer(1), integer(2)]]]],
+        assert_equals(["quasiquote", 
+                        ["quasiquote", 
+                          ["quasiquote", ["+", integer(1), integer(2)]]]],
             parse("```(+ 1 2)"))
 
     def test_expand_unquoted_symbol(self):
@@ -101,7 +104,8 @@ class TestParsingQuotes:
         assert_equals(["unquote", ["+", integer(1), integer(2)]], parse(",(+ 1 2)"))
 
     def test_quasiqute_with_unquote(self):
-        assert_equals(["quasiquote", ["+", ["unquote", "foo"], ["unquote", "bar"], integer(42)]],
+        assert_equals(["quasiquote", 
+                        ["+", ["unquote", "foo"], ["unquote", "bar"], integer(42)]],
             parse("`(+ ,foo ,bar 42)"))
 
     def test_expand_quote_combinations(self):

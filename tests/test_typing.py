@@ -3,8 +3,6 @@
 from nose.tools import assert_equals, assert_true, assert_false
 
 from moolisp.types import tag, is_type, type_of, value_of, true, false
-from moolisp.parser import parse
-from moolisp.errors import LispSyntaxError
 
 class TestTyping:
 
@@ -23,5 +21,5 @@ class TestTyping:
     def test_true(self):
         assert_true(value_of(true))
 
-    def test_true(self):
+    def test_false(self):
         assert_false(value_of(false))

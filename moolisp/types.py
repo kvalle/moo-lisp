@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from inspect import getargspec
+from errors import LispTypeError
 
 ## functions for working with types
 
@@ -9,17 +10,17 @@ def tag(tag, value):
 
 def is_type(t):
     return isinstance(t, tuple) \
-       and len(t) == 3 \
-       and t[0] == "type"
+        and len(t) == 3 \
+        and t[0] == "type"
 
 def type_of(x):
     if not is_type(x):
-        raise Error("Type of non-type: %s" % x)
+        raise LispTypeError("Type of non-type: %s" % x)
     return x[1]
 
 def value_of(x):
     if not is_type(x):
-        raise Error("Value of non-type: %s" % x)
+        raise LispTypeError("Value of non-type: %s" % x)
     return x[2]
 
 ## helper functions for built in types

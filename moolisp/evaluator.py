@@ -2,8 +2,7 @@
 
 from errors import LispSyntaxError, LispTypeError
 from env import Environment
-from types import Closure, Lambda, Builtin, \
-    is_type, type_of, value_of, boolean, is_boolean, integer, is_integer
+from types import Closure, Lambda, Builtin, value_of, boolean, is_boolean, is_integer
 from parser import unparse
 
 def is_atom(x):

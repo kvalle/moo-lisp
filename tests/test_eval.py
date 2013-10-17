@@ -5,7 +5,8 @@ from nose.tools import assert_equals, assert_raises_regexp, \
 
 from moolisp.evaluator import evaluate
 from moolisp.parser import parse
-from moolisp.types import Closure, Lambda, Builtin, true, false, integer, boolean, value_of
+from moolisp.types import Closure, Lambda, Builtin, \
+    true, false, integer, boolean, value_of
 from moolisp.errors import LispNamingError, LispSyntaxError, LispTypeError
 from moolisp.env import Environment
 
@@ -199,7 +200,9 @@ class TestEval:
     def test_quote(self):
         """Quoting returns the expression being quoted without evaluating it."""
 
-        ast = ["quote", ["foo", ["+", integer(1), integer(2)], ["*", integer(4), integer(10)]]]
+        ast = ["quote", 
+                    ["foo", ["+", integer(1), integer(2)], 
+                            ["*", integer(4), integer(10)]]]
         assert_equals(ast[1], evaluate(ast, Environment()))
 
     def test_set_bang(self):
@@ -274,8 +277,10 @@ class TestEval:
 
     def test_eval_quasiquote_with_deeper_unquotes(self):
         env = Environment({"foo": integer(42), "bar": integer(100)})
-        ast = ["quasiquote", ["+", ["unquote", "foo"], ["+", integer(1), ["unquote", "bar"]]]]
-        assert_equals(["+", integer(42), ["+", integer(1), integer(100)]], evaluate(ast, env))
+        ast = ["quasiquote", 
+                ["+", ["unquote", "foo"], ["+", integer(1), ["unquote", "bar"]]]]
+        assert_equals(["+", integer(42), ["+", integer(1), integer(100)]], 
+            evaluate(ast, env))
 
     def test_eval_unquote_outside_of_quasiquote_raises_exception(self):
         """Unquote cannot stand alone, without an *directly enclosing* quasiquote."""
