@@ -26,10 +26,6 @@ class TestEval:
         assert_equals(True, evaluate(True, Environment()))
         assert_equals(False, evaluate(False, Environment()))
 
-    def test_simple_if_statement(self):
-        ast = ["if", True, 42, 1000]
-        assert_equals(42, evaluate(ast, Environment()))
-
     def test_atom(self):
         env = Environment()
         assert_equals(True, evaluate(["atom", True], env))
@@ -38,12 +34,6 @@ class TestEval:
         assert_equals(True, evaluate(["atom", "foo"], Environment({"foo": "bar"})))
         assert_equals(False, evaluate(["atom", "foo"], Environment({"foo": ["bar"]})))
         assert_equals(False, evaluate(["atom", ["quote", ["foo", "bar"]]], env))
-
-    def test_wrong_if_syntax(self):
-        """Test evaluating if expression with too many parts"""
-
-        with assert_raises_regexp(LispSyntaxError, "Malformed if"):
-            evaluate(["if", "with", "far", "too", "many", "parts"], Environment())
 
     def test_define(self):
         """Test simplest possible define"""
@@ -167,15 +157,14 @@ class TestEval:
         oposite = """
             (define oposite
                 (lambda (p) 
-                    (if p #f #t)))
+                    (cond (p #f) (#t #t))))
         """
         fn = """ 
             (define fn 
                 ;; Meaningless (albeit recursive) function
                 (lambda (x) 
-                    (if x 
-                        (fn (oposite x))
-                        1000)))
+                    (cond (x (fn (oposite x)))
+                          (#t 1000))))
         """
         
         env = Environment()
@@ -251,7 +240,7 @@ class TestEval:
         and the arguments thould therefore be evaluated first"""
 
         env = Environment({'x': 2, '+': Builtin(lambda a, b: a + b)})
-        ast = ['+', ['if', True, 2, 'whatever'], 'x']
+        ast = ['+', ['cond', [True, 2], [True, 'whatever']], 'x']
         assert_equals(4, evaluate(ast, env))
 
     def test_eval_simple_expression(self):
@@ -332,12 +321,19 @@ class TestEval:
         """
         assert_equals(3, evaluate(parse(program), Environment()))
 
-    def test_simple_if(self):
-        assert_equals(42, evaluate(["if", True, 42, "dosn't-matter"], Environment()))
-
     def test_if_with_variable_lookup(self):
         """Test evaluation of expressions (variable lookup) within if form"""
 
         ast = ["if", "pred", "then", "else"]
         env = Environment({"pred": False, "else": 42})
         assert_equals(42, evaluate(ast, env))
+
+    def test_simple_if_statement(self):
+        ast = ["if", True, 42, 1000]
+        assert_equals(42, evaluate(ast, Environment()))
+
+    def test_wrong_if_syntax(self):
+        """Test evaluating if expression with too many parts"""
+
+        with assert_raises_regexp(LispSyntaxError, "Malformed if"):
+            evaluate(["if", "with", "far", "too", "many", "parts"], Environment())
