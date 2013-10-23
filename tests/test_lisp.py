@@ -19,7 +19,7 @@ class TestMooLisp:
                         1 
                         (* n (fact (- n 1))))))
         """, env)
-        assert_equals(integer(120), interpret("(fact 5)", env))
+        assert_equals("120", interpret("(fact 5)", env))
 
     def test_gcd(self):
         """Greates common dividor"""
@@ -31,5 +31,5 @@ class TestMooLisp:
                         a 
                         (gcd b (mod a b)))))
         """, env)
-        assert_equals(integer(6), interpret("(gcd 108 30)", env))
-        assert_equals(integer(1), interpret("(gcd 17 5)", env))
+        assert_equals("6", interpret("(gcd 108 30)", env))
+        assert_equals("1", interpret("(gcd 17 5)", env))

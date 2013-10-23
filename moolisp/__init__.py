@@ -14,13 +14,11 @@ def parse_file(filename):
     try:
         with open(filename, 'r') as sourcefile:
             source = "(begin %s)" % "".join(sourcefile.readlines())
-            print unparse(interpret(source))
+            print interpret(source, get_default_env())
     except LispError, e:
         print e
         sys.exit(1)
 
-def interpret(source, env=None):
-    """Interpret a moo-lisp program statement."""
-    if env is None:
-        env = get_default_env()
-    return evaluate(parse(source), env)
+def interpret(source, env):
+    """Interpret a moo-lisp program statement, returning the result, both as strings."""
+    return unparse(evaluate(parse(source), env))
