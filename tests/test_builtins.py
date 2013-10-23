@@ -2,7 +2,6 @@
 
 from nose.tools import assert_equals
 
-from moolisp.types import integer, true, false
 from moolisp import interpret
 from moolisp.env import get_default_env
 

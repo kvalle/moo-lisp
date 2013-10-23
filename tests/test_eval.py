@@ -5,8 +5,7 @@ from nose.tools import assert_equals, assert_raises_regexp, \
 
 from moolisp.evaluator import evaluate
 from moolisp.parser import parse
-from moolisp.types import Closure, Lambda, Builtin, \
-    true, false, integer, boolean, value_of
+from moolisp.types import Closure, Lambda, Builtin, integer, boolean, value_of
 from moolisp.errors import LispNamingError, LispSyntaxError, LispTypeError
 from moolisp.env import Environment
 
@@ -24,17 +23,17 @@ class TestEval:
         assert_equals(integer(42), evaluate(integer(42), Environment()))
 
     def test_eval_boolean(self):
-        assert_equals(true, evaluate(true, Environment()))
-        assert_equals(false, evaluate(false, Environment()))
+        assert_equals(boolean(True), evaluate(boolean(True), Environment()))
+        assert_equals(boolean(False), evaluate(boolean(False), Environment()))
 
     def test_atom(self):
         env = Environment()
-        assert_equals(true, evaluate(["atom", true], env))
-        assert_equals(true, evaluate(["atom", false], env))
-        assert_equals(true, evaluate(["atom", integer(42)], env))
-        assert_equals(true, evaluate(["atom", "foo"], Environment({"foo": "bar"})))
-        assert_equals(false, evaluate(["atom", "foo"], Environment({"foo": ["bar"]})))
-        assert_equals(false, evaluate(["atom", ["quote", ["foo", "bar"]]], env))
+        assert_equals(boolean(True), evaluate(["atom", boolean(True)], env))
+        assert_equals(boolean(True), evaluate(["atom", boolean(False)], env))
+        assert_equals(boolean(True), evaluate(["atom", integer(42)], env))
+        assert_equals(boolean(True), evaluate(["atom", "foo"], Environment({"foo": "bar"})))
+        assert_equals(boolean(False), evaluate(["atom", "foo"], Environment({"foo": ["bar"]})))
+        assert_equals(boolean(False), evaluate(["atom", ["quote", ["foo", "bar"]]], env))
 
     def test_define(self):
         """Test simplest possible define"""
@@ -172,8 +171,8 @@ class TestEval:
         evaluate(parse(oposite), env)
         evaluate(parse(fn), env)
 
-        assert_equals(integer(1000), evaluate(["fn", true], env))
-        assert_equals(integer(1000), evaluate(["fn", false], env))
+        assert_equals(integer(1000), evaluate(["fn", boolean(True)], env))
+        assert_equals(integer(1000), evaluate(["fn", boolean(False)], env))
 
     def test_begin_form(self):
         """Testing evaluating expressions in sequence with the begin 
@@ -246,7 +245,7 @@ class TestEval:
             'x': integer(2), 
             '+': Builtin(lambda a, b: integer(value_of(a) + value_of(b)))
         })
-        ast = ['+', ['cond', [true, integer(2)], [true, 'whatever']], 'x']
+        ast = ['+', ['cond', [boolean(True), integer(2)], [boolean(True), 'whatever']], 'x']
         assert_equals(integer(4), evaluate(ast, env))
 
     def test_eval_simple_expression(self):
@@ -334,11 +333,11 @@ class TestEval:
         """Test evaluation of expressions (variable lookup) within if form"""
 
         ast = ["if", "pred", "then", "else"]
-        env = Environment({"pred": false, "else": integer(42)})
+        env = Environment({"pred": boolean(False), "else": integer(42)})
         assert_equals(integer(42), evaluate(ast, env))
 
     def test_simple_if_statement(self):
-        ast = ["if", true, integer(42), integer(1000)]
+        ast = ["if", boolean(True), integer(42), integer(1000)]
         assert_equals(integer(42), evaluate(ast, Environment()))
 
     def test_wrong_if_syntax(self):

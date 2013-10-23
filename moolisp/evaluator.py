@@ -2,19 +2,15 @@
 
 from errors import LispSyntaxError, LispTypeError
 from env import Environment
-from types import Closure, Lambda, Builtin, value_of, boolean, is_boolean, is_integer
+from types import Closure, Lambda, Builtin
+from types import value_of, boolean, is_boolean, is_integer, is_atom, is_symbol, is_list
 from parser import unparse
-
-def is_atom(x):
-    return is_integer(x) \
-        or isinstance(x, str) \
-        or is_boolean(x)
 
 def evaluate(ast, env):
     """Evaluate an Abstract Syntax Tree in the specified environment."""
-    if isinstance(ast, str): return env[ast]
+    if is_symbol(ast): return env[ast]
     elif is_atom(ast): return ast
-    elif isinstance(ast, list):
+    elif is_list(ast):
         if ast[0] == 'cond': return _cond(ast, env)
         elif ast[0] == 'let': return _let(ast, env)
         elif ast[0] == 'eval': return _eval(ast, env)

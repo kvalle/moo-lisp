@@ -2,7 +2,7 @@
 
 from nose.tools import assert_equals, assert_true, assert_false
 
-from moolisp.types import tag, is_type, type_of, value_of, true, false
+from moolisp.types import tag, is_type, type_of, value_of
 
 class TestTyping:
 
@@ -19,7 +19,7 @@ class TestTyping:
         assert_equals('footype', type_of(t))
 
     def test_true(self):
-        assert_true(value_of(true))
+        assert_true(value_of(tag('bool', True)))
 
     def test_false(self):
-        assert_false(value_of(false))
+        assert_false(value_of(tag('bool', False)))
