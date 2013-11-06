@@ -56,6 +56,19 @@ def is_integer(x):
 
 ## function helper classes
 
+def is_macro(x):
+    return isinstance(x, Macro)
+
+def is_closure(x):
+    return isinstance(x, Closure)
+
+def is_lambda(x):
+    return isinstance(x, Lambda)
+
+def is_builtin(x):
+    return isinstance(x, Builtin)
+
+
 class Closure:
     "Abstract base type for builtins and lambdas"
     pass
@@ -78,3 +91,11 @@ class Lambda(Closure):
 
     def __str__(self):
         return "<lambda/%d>" % len(self.params)
+
+class Macro:
+    def __init__(self, params, body):
+        self.params = params
+        self.body = body
+
+    def __str__(self):
+        return "<macro/%d>" % len(self.params)

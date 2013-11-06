@@ -2,8 +2,9 @@
 
 from errors import LispSyntaxError, LispTypeError
 from env import Environment
-from types import Closure, Lambda, Builtin
+from types import Closure, Lambda, Builtin, Macro
 from types import value_of, boolean, is_boolean, is_integer, is_atom, is_symbol, is_list
+from types import is_macro, is_closure, is_lambda, is_builtin
 from parser import unparse
 
 def evaluate(ast, env):
@@ -95,17 +96,22 @@ def _let(ast, env):
 
 def _apply(ast, env):
     cls = evaluate(ast[0], env)
-    if not isinstance(cls, Closure):
+
+    # macros are expanded and then evaluated
+    if is_macro(cls):
+        return evaluate(_expand(ast, env), env)
+
+    if not is_closure(cls):
         raise LispTypeError("Call to non-function: " + unparse(ast))
 
     args = [evaluate(exp, env) for exp in ast[1:]]
-    if isinstance(cls, Lambda):
+    if is_lambda(cls):
         if len(args) != len(cls.params):
             msg = "Wrong number of arguments, expected %d got %d: %s" \
                 % (len(cls.params), len(args), unparse(ast))
             raise LispTypeError(msg)
         return evaluate(cls.body, Environment(zip(cls.params, args), env))
-    elif isinstance(cls, Builtin):
+    elif is_builtin(cls):
         return cls.fn(*args)
     else:
         raise Exception("Unknown implementation of Closure: %s" % cls)
