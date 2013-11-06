@@ -12,7 +12,10 @@ def evaluate(ast, env):
     if is_symbol(ast): return env[ast]
     elif is_atom(ast): return ast
     elif is_list(ast):
-        if ast[0] == 'cond': return _cond(ast, env)
+        if ast[0] == 'macro': return _macro(ast, env)
+        elif ast[0] == 'expand': return _expand(ast, env)
+        elif ast[0] == 'expand-1': return _expand_1(ast, env)
+        elif ast[0] == 'cond': return _cond(ast, env)
         elif ast[0] == 'let': return _let(ast, env)
         elif ast[0] == 'eval': return _eval(ast, env)
         elif ast[0] == 'set!': return _set(ast, env)
@@ -25,6 +28,39 @@ def evaluate(ast, env):
         else: return _apply(ast, env)
     else:
         raise LispSyntaxError(ast)
+
+def _macro(ast, env):
+    (_, params, body) = ast
+    return Macro(params, body)
+
+def _expand_1(ast, env):
+    # def transform(ast, substitutions):
+    #     if is_symbol(ast) and ast in substitutions:
+    #         return substitutions[ast]
+    #     elif is_list(ast):
+    #         return [transform(x, substitutions) for x in ast]
+    #     else:
+    #         return ast
+    
+    def _is_macro_type(ast, env):
+        if is_list(ast): 
+            return False
+        else: 
+            return is_macro(ast) \
+                or is_macro(env.get(ast, False))
+
+    # extract form to expand
+    form = evaluate(ast[1], env)
+    if not _is_macro_type(form[0], env):
+        # if form is not a macro call, return form directly
+        return form
+
+    macro = evaluate(form[0], env)
+    substitutions = Environment(zip(macro.params, form[1:]), env)
+    return evaluate(macro.body, substitutions)
+
+def _expand(ast, env):
+    return "not implemented"
 
 def _cond(ast, env):
     for predicate, ast in ast[1:]:
@@ -96,10 +132,6 @@ def _let(ast, env):
 
 def _apply(ast, env):
     cls = evaluate(ast[0], env)
-
-    # macros are expanded and then evaluated
-    if is_macro(cls):
-        return evaluate(_expand(ast, env), env)
 
     if not is_closure(cls):
         raise LispTypeError("Call to non-function: " + unparse(ast))
