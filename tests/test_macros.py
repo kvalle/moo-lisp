@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+"""
+Tests for the macro system of Moo Lisp.
+The macros are heavily inspired by how Clojure macros works.
+"""
+
 from nose.tools import assert_equals, assert_raises_regexp, \
     assert_raises, assert_true, assert_false, assert_is_instance
 
@@ -13,7 +18,8 @@ class TestMacros:
     def test_defining_macro(self):
         """(macro ...) should return something of type macro"""
 
-        macro = evaluate(["macro", ["foo", "bar"], ["quote", ["bar", "foo"]]], Environment())
+        macro = evaluate(["macro", ["foo", "bar"], ["quote", ["bar", "foo"]]], 
+            Environment())
         assert_true(is_macro(macro))
         assert_equals(["foo", "bar"], macro.params)
         assert_equals(["quote", ["bar", "foo"]], macro.body)
@@ -42,22 +48,64 @@ class TestMacros:
         assert_equals("(add-foo (cons foo nil))", 
             interpret("(expand-1 '(add-foo nil))", env))        
 
-    def test_expand_1_used_twice(self):
-        """expand-1 used twice expands macro twice
+    def test_expanding_recursive_macro(self):
+        """Recursive macros just keep on expanding if recursive call is root
 
-        example from clojure:
-        
-            user=> (defmacro add-foo [lst] `(add-foo (cons foo ~lst)))
-            #'user/add-foo
-            user=> (macroexpand-1 '(add-foo nil))
-            (user/add-foo (clojure.core/cons user/foo nil))
-            user=> (macroexpand-1 (macroexpand-1 '(add-foo nil)))
-            (user/add-foo (clojure.core/cons user/foo (clojure.core/cons user/foo nil)))
+        Based on this clojure example:
+
+            user=> (defmacro test [x] `(test ~x))
+            #'user/test
+            user=> (macroexpand-1 '(test true))
+            (user/test true)
+            user=> (macroexpand-1 (macroexpand-1 (macroexpand-1 '(test true))))
+            (user/test true)
+            user=> (macroexpand '(test true))
+            StackOverflowError   clojure.lang.ASeq.more (ASeq.java:116)
         """
 
         env = Environment()
-        interpret("""(define add-foo 
-                        (macro (lst) 
-                            `(add-foo (cons foo ,lst))))""", env)
-        assert_equals("(add-foo (cons foo (cons foo nil)))", 
-            interpret("(expand-1 (expand-1 '(add-foo nil)))", env))        
+        interpret("""(define test 
+                        (macro (x) 
+                            `(test ,x)))""", env)
+        assert_equals("(test #t)", 
+            interpret("(expand-1 '(test #t))", env))  
+        assert_equals("(test #t)", 
+            interpret("(expand-1 (expand-1 '(test #t)))", env))  
+        assert_equals("(test #t)", 
+            interpret("(expand-1 (expand-1 (expand-1 '(test #t))))", env))  
+
+    def test_expand_expands_until_form_is_not_macro_call(self):
+        """Expansion continues until root element of result isn't macro call.
+
+        Clojure example:
+
+            user=> (defmacro unless [pred a b] `(if ~pred ~b ~a))
+            #'user/unless
+            user=> (defmacro test [x] `(unless ~x 'foo 'bar))
+            #'user/test
+            user=> (macroexpand-1 '(test true))
+            (user/unless true (quote user/foo) (quote user/bar))
+            user=> (macroexpand '(test true))
+            (if true (quote user/bar) (quote user/foo))
+        """
+        env = Environment()#get_default_env()
+
+        # interpret("""(define expand
+        #                 (lambda (exp)
+        #                     (if (= exp (expand-1 exp))
+        #                         exp
+        #                         (expand exp))))""", env)
+        #interpret("""(define expand (lambda (x) (expand-1 x)))""", env)
+
+        interpret("""(define unless 
+                        (macro (pred a b) 
+                            `(if ,pred ,b ,a)))""", env)
+        interpret("""(define test 
+                        (macro (x) 
+                            `(unless ,x 'foo 'bar)))""", env)
+
+        assert_equals("(unless #t 'foo 'bar)", 
+            interpret("(expand-1 '(test #t))", env))  
+        
+        assert_equals("(if #t 'bar 'foo)",
+            interpret("(expand '(test #t))", env))  

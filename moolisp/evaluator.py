@@ -34,23 +34,16 @@ def _macro(ast, env):
     return Macro(params, body)
 
 def _expand_1(ast, env):
-    # def transform(ast, substitutions):
-    #     if is_symbol(ast) and ast in substitutions:
-    #         return substitutions[ast]
-    #     elif is_list(ast):
-    #         return [transform(x, substitutions) for x in ast]
-    #     else:
-    #         return ast
-    
-    def _is_macro_type(ast, env):
-        if is_list(ast): 
-            return False
-        else: 
-            return is_macro(ast) \
-                or is_macro(env.get(ast, False))
+    """evaluates (expand-1 <arg>)"""
 
-    # extract form to expand
+    def _is_macro_type(ast, env):
+        return is_macro(ast) \
+            or is_macro(env.get(ast, False))
+
+    # expand-1 behaves as a function, and thus evaluates it's argument
+    # into a s-expr that is then expanded once
     form = evaluate(ast[1], env)
+
     if not _is_macro_type(form[0], env):
         # if form is not a macro call, return form directly
         return form
@@ -60,7 +53,20 @@ def _expand_1(ast, env):
     return evaluate(macro.body, substitutions)
 
 def _expand(ast, env):
-    return "not implemented"
+    def _is_macro_type(ast, env):
+        return is_macro(ast) \
+            or is_macro(env.get(ast, False))
+
+    # expand behaves as a function, and thus evaluates it's argument
+    # into a s-expr that is then expanded once
+    form = evaluate(ast[1], env)
+
+    while _is_macro_type(form[0], env):
+        macro = evaluate(form[0], env)
+        substitutions = Environment(zip(macro.params, form[1:]), env)
+        form = evaluate(macro.body, substitutions)
+
+    return form
 
 def _cond(ast, env):
     for predicate, ast in ast[1:]:
