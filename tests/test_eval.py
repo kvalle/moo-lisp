@@ -269,6 +269,12 @@ class TestEval:
         assert_equals(["+", integer(1), integer(2)], 
             evaluate(["quasiquote", ["+", integer(1), integer(2)]], Environment()))
 
+    def test_simple_quasiquote_with_unquotes(self):
+        env = Environment({"bar": 'inc', "foo": integer(42)})
+        ast = ['quasiquote', [['unquote', 'bar'], ['unquote', 'foo']]]
+        assert_equals(parse("`(,bar ,foo)"), ast)
+        assert_equals(['inc', integer(42)], evaluate(ast, env))
+
     def test_eval_quasiquote_with_top_level_unquote(self):
         env = Environment({"foo": integer(42), "bar": integer(100)})
         ast = ["quasiquote", ["+", ["unquote", "foo"], ["unquote", "bar"]]]

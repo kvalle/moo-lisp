@@ -108,7 +108,7 @@ def _quote(ast, env):
             _assert_exp_length(ast, 2)
             return evaluate(ast[1], env)
         else:
-            return [ast[0]] + [quasiquote(exp, env) for exp in ast[1:]]
+            return [quasiquote(exp, env) for exp in ast]
 
     _assert_exp_length(ast, 2)
     if ast[0] == 'quote':
