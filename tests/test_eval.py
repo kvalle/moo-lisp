@@ -28,12 +28,23 @@ class TestEval:
 
     def test_atom(self):
         env = Environment()
-        assert_equals(boolean(True), evaluate(["atom", boolean(True)], env))
-        assert_equals(boolean(True), evaluate(["atom", boolean(False)], env))
-        assert_equals(boolean(True), evaluate(["atom", integer(42)], env))
-        assert_equals(boolean(True), evaluate(["atom", "foo"], Environment({"foo": "bar"})))
-        assert_equals(boolean(False), evaluate(["atom", "foo"], Environment({"foo": ["bar"]})))
-        assert_equals(boolean(False), evaluate(["atom", ["quote", ["foo", "bar"]]], env))
+        assert_equals(boolean(True), 
+            evaluate(["atom", boolean(True)], env))
+
+        assert_equals(boolean(True), 
+            evaluate(["atom", boolean(False)], env))
+
+        assert_equals(boolean(True), 
+            evaluate(["atom", integer(42)], env))
+
+        assert_equals(boolean(True), 
+            evaluate(["atom", "foo"], Environment({"foo": "bar"})))
+
+        assert_equals(boolean(False), 
+            evaluate(["atom", "foo"], Environment({"foo": ["bar"]})))
+
+        assert_equals(boolean(False), 
+            evaluate(["atom", ["quote", ["foo", "bar"]]], env))
 
     def test_define(self):
         """Test simplest possible define"""
@@ -245,7 +256,10 @@ class TestEval:
             'x': integer(2), 
             '+': Builtin(lambda a, b: integer(value_of(a) + value_of(b)))
         })
-        ast = ['+', ['cond', [boolean(True), integer(2)], [boolean(True), 'whatever']], 'x']
+        ast = ['+', ['cond', 
+                        [boolean(True), integer(2)], 
+                        [boolean(True), 'whatever']], 
+                    'x']
         assert_equals(integer(4), evaluate(ast, env))
 
     def test_eval_simple_expression(self):

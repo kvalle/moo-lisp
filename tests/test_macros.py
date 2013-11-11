@@ -5,13 +5,12 @@ Tests for the macro system of Moo Lisp.
 The macros are heavily inspired by how Clojure macros works.
 """
 
-from nose.tools import assert_equals, assert_raises_regexp, \
-    assert_raises, assert_true, assert_false, assert_is_instance
+from nose.tools import assert_equals, assert_true
 
 from moolisp import interpret
 from moolisp.evaluator import evaluate
 from moolisp.env import Environment, get_builtin_env
-from moolisp.types import Macro, boolean, integer, is_macro
+from moolisp.types import is_macro
 
 class TestMacros:
 

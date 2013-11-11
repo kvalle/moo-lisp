@@ -4,7 +4,7 @@ from errors import LispSyntaxError, LispTypeError
 from env import Environment
 from types import Lambda, Macro
 from types import value_of, boolean, is_boolean, is_atom, is_symbol, is_list
-from types import is_macro, is_closure, is_lambda, is_builtin
+from types import is_macro, is_lambda, is_builtin
 from parser import unparse
 
 def evaluate(ast, env):

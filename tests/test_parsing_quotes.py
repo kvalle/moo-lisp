@@ -63,7 +63,8 @@ class TestParsingQuotes:
     def test_expand_single_quoted_list(self):
         assert_equals(["foo", ["quote", ["+", integer(1), integer(2)]]], 
             parse("(foo '(+ 1 2))"))
-        assert_equals(["foo", ["quote", [boolean(True), boolean(False)]]], parse("(foo '(#t #f))"))
+        assert_equals(["foo", ["quote", [boolean(True), boolean(False)]]], 
+            parse("(foo '(#t #f))"))
 
     def test_expand_quotes_with_lists(self):
         assert_equals(["quote", ["foo", "bar"]], parse("'(foo bar)"))
