@@ -3,7 +3,7 @@
 import sys
 from errors import LispError
 from colors import colored, faded
-from env import get_default_env
+from env import get_builtin_env
 from parser import parse, unparse, remove_comments
 from evaluator import evaluate
 
@@ -23,7 +23,7 @@ def repl():
     print faded("  use ^D to exit")
     print
 
-    env = get_default_env()
+    env = get_builtin_env()
     while True:
         try:
             source = read_expression()

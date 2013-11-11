@@ -10,7 +10,7 @@ from nose.tools import assert_equals, assert_raises_regexp, \
 
 from moolisp import interpret
 from moolisp.evaluator import evaluate
-from moolisp.env import Environment, get_default_env
+from moolisp.env import Environment, get_builtin_env
 from moolisp.types import Macro, boolean, integer, is_macro
 
 class TestMacros:
@@ -32,7 +32,7 @@ class TestMacros:
 
     def test_expand_simple_macro_once(self):
         """expand-1 should expand macro call expression once"""
-        env = get_default_env()
+        env = get_builtin_env()
         interpret("""(define swp 
                         (macro (foo bar) 
                             (list bar foo)))""", env)

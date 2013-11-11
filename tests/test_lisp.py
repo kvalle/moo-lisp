@@ -4,14 +4,14 @@ from nose.tools import assert_equals
 
 from moolisp import interpret
 from moolisp.types import integer
-from moolisp.env import get_default_env
+from moolisp.env import get_builtin_env
 
 class TestMooLisp:
     """Testing the implementation with a few non-trivial programs"""
 
     def test_factorial(self):
         """Simple factorial"""
-        env = get_default_env()
+        env = get_builtin_env()
         interpret("""
             (define fact
                 (lambda (n)
@@ -23,7 +23,7 @@ class TestMooLisp:
 
     def test_gcd(self):
         """Greates common dividor"""
-        env = get_default_env()
+        env = get_builtin_env()
         interpret("""
             (define gcd
                 (lambda (a b)

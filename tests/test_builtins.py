@@ -3,12 +3,12 @@
 from nose.tools import assert_equals
 
 from moolisp import interpret
-from moolisp.env import get_default_env
+from moolisp.env import get_builtin_env
 
 class TestBuiltins:
 
     def setup(self):
-        self.env = get_default_env()
+        self.env = get_builtin_env()
 
     def test_arithmetic_functions(self):
         """Sanity check for the builtin artihmetic functions"""

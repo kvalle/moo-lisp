@@ -7,14 +7,14 @@ from evaluator import evaluate
 from parser import parse, unparse
 from repl import repl
 from errors import LispError
-from env import get_default_env
+from env import get_builtin_env
 
 def parse_file(filename):
     """Interpret a .moo source file"""
     try:
         with open(filename, 'r') as sourcefile:
             source = "(begin %s)" % "".join(sourcefile.readlines())
-            print interpret(source, get_default_env())
+            print interpret(source, get_builtin_env())
     except LispError, e:
         print e
         sys.exit(1)
