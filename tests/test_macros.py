@@ -88,14 +88,7 @@ class TestMacros:
             user=> (macroexpand '(test true))
             (if true (quote user/bar) (quote user/foo))
         """
-        env = Environment()#get_default_env()
-
-        # interpret("""(define expand
-        #                 (lambda (exp)
-        #                     (if (= exp (expand-1 exp))
-        #                         exp
-        #                         (expand exp))))""", env)
-        #interpret("""(define expand (lambda (x) (expand-1 x)))""", env)
+        env = Environment()
 
         interpret("""(define unless 
                         (macro (pred a b) 
