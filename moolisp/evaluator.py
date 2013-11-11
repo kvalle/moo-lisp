@@ -2,8 +2,8 @@
 
 from errors import LispSyntaxError, LispTypeError
 from env import Environment
-from types import Closure, Lambda, Builtin, Macro
-from types import value_of, boolean, is_boolean, is_integer, is_atom, is_symbol, is_list
+from types import Lambda, Macro
+from types import value_of, boolean, is_boolean, is_atom, is_symbol, is_list
 from types import is_macro, is_closure, is_lambda, is_builtin
 from parser import unparse
 
@@ -33,39 +33,35 @@ def _macro(ast, env):
     (_, params, body) = ast
     return Macro(params, body)
 
-def _expand_1(ast, env):
-    """evaluates (expand-1 <arg>)"""
+def _is_macro_call(ast, env):
+    first = ast[0]
+    return is_macro(first) \
+        or is_macro(env.get(first, False))
 
-    def _is_macro_type(ast, env):
-        return is_macro(ast) \
-            or is_macro(env.get(ast, False))
+def expand_once(form, env):
+    """expand macro form once
 
-    # expand-1 behaves as a function, and thus evaluates it's argument
-    # into a s-expr that is then expanded once
-    form = evaluate(ast[1], env)
+    Assumes first element of form is a macro or macro call.
+    Evaluates this element in case it is a reference"""
 
-    if not _is_macro_type(form[0], env):
-        # if form is not a macro call, return form directly
-        return form
-
-    macro = evaluate(form[0], env)
+    # might be call to named macro in the environment
+    macro = evaluate(form[0], env) 
+    
+    # expand
     substitutions = Environment(zip(macro.params, form[1:]), env)
-    return evaluate(macro.body, substitutions)
+    expansion = evaluate(macro.body, substitutions)
+    return expansion
+
+def _expand_1(ast, env):
+    form = evaluate(ast[1], env)
+    if _is_macro_call(form, env):
+        form = expand_once(form, env)
+    return form
 
 def _expand(ast, env):
-    def _is_macro_type(ast, env):
-        return is_macro(ast) \
-            or is_macro(env.get(ast, False))
-
-    # expand behaves as a function, and thus evaluates it's argument
-    # into a s-expr that is then expanded once
     form = evaluate(ast[1], env)
-
-    while _is_macro_type(form[0], env):
-        macro = evaluate(form[0], env)
-        substitutions = Environment(zip(macro.params, form[1:]), env)
-        form = evaluate(macro.body, substitutions)
-
+    while _is_macro_call(form, env):
+        form = expand_once(form, env)
     return form
 
 def _cond(ast, env):
