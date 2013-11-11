@@ -21,8 +21,8 @@ class Environment(dict):
         else:
             raise LispNamingError("Variable '%s' is undefined" % variable)
 
-def get_default_env(interactive=False):
-    env = Environment({
+def get_default_env():
+    return Environment({
         '+': Builtin(lambda x, y: integer(value_of(x) + value_of(y))),
         '-': Builtin(lambda x, y: integer(value_of(x) - value_of(y))),
         '*': Builtin(lambda x, y: integer(value_of(x) * value_of(y))),
@@ -41,7 +41,3 @@ def get_default_env(interactive=False):
         'cdr': Builtin(lambda lst: lst[1:]),
         'list': Builtin(lambda *args: list(args))
     })
-    if interactive:
-        from usage import help
-        env['help'] = Builtin(help)
-    return env

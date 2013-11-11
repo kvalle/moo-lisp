@@ -20,11 +20,10 @@ def repl():
     print "         the MOO-lisp  " + faded("    (__)\       )\/\ ")
     print "             REPL      " + faded("        ||----w |    ")
     print "                       " + faded("        ||     ||    ")
-    print faded("  use (help) to get help")
     print faded("  use ^D to exit")
     print
 
-    env = get_default_env(interactive=True)
+    env = get_default_env()
     while True:
         try:
             source = read_expression()
