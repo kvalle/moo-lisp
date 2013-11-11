@@ -52,6 +52,7 @@ def atomize(elem):
 def parse_multiple(source):
     """Creates a list of ASTs from program source 
     constituting multiple expressions"""
+    source = remove_comments(source)
     return [parse(exp) for exp in split_exps(source)]
 
 def split_exps(source):
