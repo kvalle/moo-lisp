@@ -22,7 +22,7 @@ class Environment(dict):
             raise LispNamingError("Variable '%s' is undefined" % variable)
 
 def get_builtin_env():
-    """Returns environment with the builtin functions defined"""
+    """Returns an environment with the builtin functions defined"""
     return Environment({
         '+': Builtin(lambda x, y: integer(value_of(x) + value_of(y))),
         '-': Builtin(lambda x, y: integer(value_of(x) - value_of(y))),

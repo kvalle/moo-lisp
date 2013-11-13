@@ -2,7 +2,7 @@
 
 from nose.tools import assert_equals
 
-from moolisp import interpret
+from moolisp.interpreter import interpret
 from moolisp.env import get_builtin_env
 
 class TestBuiltins:

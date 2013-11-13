@@ -3,17 +3,15 @@
 import sys
 from errors import LispError
 from colors import colored, faded
-from env import get_builtin_env
-from parser import parse, unparse, remove_comments
-from evaluator import evaluate
+from parser import remove_comments
+from interpreter import interpret, default_env
 
 # importing this gives readline goodness when running on systems
 # where it is supported (i.e. UNIX-y systems)
 import readline   # noqa
 
 def repl():
-    """Start the interactive Read-Eval-Print-Loop
-    """
+    """Start the interactive Read-Eval-Print-Loop"""
     print
     print "                       " + faded("    ^__^             ")
     print "          welcome to   " + faded("    (oo)\_______     ")
@@ -23,13 +21,11 @@ def repl():
     print faded("  use ^D to exit")
     print
 
-    env = get_builtin_env()
+    env = default_env()
     while True:
         try:
             source = read_expression()
-            result = evaluate(parse(source), env)
-            if result is not None: 
-                print unparse(result)
+            print interpret(source, env)
         except LispError, e:
             print colored("!", "red"),
             print faded(str(e.__class__.__name__) + ":"),
