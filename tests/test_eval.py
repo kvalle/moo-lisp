@@ -348,20 +348,3 @@ class TestEval:
                   (#t 4))
         """
         assert_equals(integer(3), evaluate(parse(program), Environment()))
-
-    def test_if_with_variable_lookup(self):
-        """Test evaluation of expressions (variable lookup) within if form"""
-
-        ast = ["if", "pred", "then", "else"]
-        env = Environment({"pred": boolean(False), "else": integer(42)})
-        assert_equals(integer(42), evaluate(ast, env))
-
-    def test_simple_if_statement(self):
-        ast = ["if", boolean(True), integer(42), integer(1000)]
-        assert_equals(integer(42), evaluate(ast, Environment()))
-
-    def test_wrong_if_syntax(self):
-        """Test evaluating if expression with too many parts"""
-
-        with assert_raises_regexp(LispSyntaxError, "Malformed if"):
-            evaluate(["if", "with", "far", "too", "many", "parts"], Environment())

@@ -24,7 +24,6 @@ def evaluate(ast, env):
         elif ast[0] == 'atom': return eval_atom(ast, env)
         elif ast[0] == 'begin': return eval_begin(ast, env)
         elif ast[0] == 'define': return eval_define(ast, env)
-        elif ast[0] == 'if': return eval_if(ast, env)
         else: return apply(ast, env)
     else:
         raise LispSyntaxError(ast)
@@ -70,13 +69,6 @@ def eval_cond(ast, env):
         _assert_boolean(p, predicate)
         if value_of(p) is True:
             return evaluate(ast, env)
-
-def eval_if(ast, env):
-    _assert_exp_length(ast, 4)
-    (_, pred, then_exp, else_exp) = ast
-    p = evaluate(pred, env)
-    _assert_boolean(p, pred)
-    return evaluate((then_exp if value_of(p) else else_exp), env)
 
 def eval_atom(ast, env):
     arg = evaluate(ast[1], env)
