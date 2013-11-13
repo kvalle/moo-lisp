@@ -6,7 +6,7 @@ from nose.tools import assert_equals, assert_raises_regexp, \
 from moolisp.evaluator import evaluate
 from moolisp.parser import parse
 from moolisp.types import Closure, Lambda, Builtin, integer, boolean, value_of
-from moolisp.errors import LispNamingError, LispSyntaxError, LispTypeError
+from moolisp.errors import LispError, LispNamingError, LispSyntaxError, LispTypeError
 from moolisp.env import Environment
 
 class TestEval:
@@ -304,17 +304,14 @@ class TestEval:
     def test_eval_unquote_outside_of_quasiquote_raises_exception(self):
         """Unquote cannot stand alone, without an *directly enclosing* quasiquote."""
 
-        env = Environment()
-        msg = "Unquote outside of quasiquote: ,foo"
-
-        with assert_raises_regexp(LispSyntaxError, msg):
+        with assert_raises(LispError):
             # standalone unquote
-            evaluate(["unquote", "foo"], env)
+            evaluate(["unquote", "foo"], Environment())
 
-        with assert_raises_regexp(LispSyntaxError, msg):
+        with assert_raises(LispError):
             # unquote within another unquote
             ast = ["quasiquote", ["unquote", ["unquote", "foo"]]]
-            evaluate(ast, env)
+            evaluate(ast, Environment())
 
     def test_simple_let_expression(self):
         """Let expressions should create a new environment with the new definitions,

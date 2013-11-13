@@ -19,7 +19,8 @@ def evaluate(ast, env):
         elif ast[0] == 'let': return eval_let(ast, env)
         elif ast[0] == 'eval': return eval_eval(ast, env)
         elif ast[0] == 'set!': return eval_set(ast, env)
-        elif ast[0] in ('quote', 'unquote', 'quasiquote'): return eval_quote(ast, env)
+        elif ast[0] == 'quote': return eval_quote(ast, env)
+        elif ast[0] == 'quasiquote': return eval_quasiquote(ast, env)
         elif ast[0] in ('lambda', 'λ'): return eval_lambda(ast, env)
         elif ast[0] == 'atom': return eval_atom(ast, env)
         elif ast[0] == 'begin': return eval_begin(ast, env)
@@ -124,23 +125,22 @@ def eval_begin(ast, env):
     results = [evaluate(exp, env) for exp in ast[1:]]
     return results[-1]
 
-def eval_quote(ast, env):
-    def quasiquote(ast, env):
+def eval_quasiquote(ast, env):
+    def qq(ast, env):
         if not isinstance(ast, list):
             return ast
         elif ast[0] == "unquote":
             _assert_exp_length(ast, 2)
             return evaluate(ast[1], env)
         else:
-            return [quasiquote(exp, env) for exp in ast]
+            return [qq(exp, env) for exp in ast]
 
+    _assert_exp_length(ast, 2)    
+    return qq(ast[1], env)
+
+def eval_quote(ast, env):
     _assert_exp_length(ast, 2)
-    if ast[0] == 'quote':
-        return ast[1]
-    elif ast[0] == 'quasiquote':
-        return quasiquote(ast[1], env)
-    elif ast[0] == 'unquote':
-        raise LispSyntaxError("Unquote outside of quasiquote: %s" % unparse(ast))
+    return ast[1]
 
 def eval_set(ast, env):
     _assert_exp_length(ast, 3)
