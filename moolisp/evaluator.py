@@ -90,6 +90,7 @@ def eval_eval(ast, env):
 def eval_define(ast, env):
     _assert_valid_definition(ast[1:])
     env[ast[1]] = evaluate(ast[2], env)
+    return ast[1]
 
 def eval_lambda(ast, env):
     _assert_exp_length(ast, 3)
