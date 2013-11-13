@@ -7,9 +7,9 @@ The macros are heavily inspired by how Clojure macros works.
 
 from nose.tools import assert_equals, assert_true
 
-from moolisp.interpreter import interpret
+from moolisp.interpreter import interpret, default_env
 from moolisp.evaluator import evaluate
-from moolisp.env import Environment, get_builtin_env
+from moolisp.env import Environment
 from moolisp.types import is_macro
 
 class TestMacros:
@@ -31,7 +31,7 @@ class TestMacros:
 
     def test_expand_simple_macro_once(self):
         """expand-1 should expand macro call expression once"""
-        env = get_builtin_env()
+        env = default_env()
         interpret("""(define swp 
                         (macro (foo bar) 
                             (list bar foo)))""", env)
