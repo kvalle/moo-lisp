@@ -36,7 +36,6 @@ def get_builtin_env():
         '>=': Builtin(lambda x, y: boolean(x >= y)), 
         '<=': Builtin(lambda x, y: boolean(x <= y)),
 
-        'nil': [],
         'cons': Builtin(lambda h, rest: [h] + rest),
         'car': Builtin(lambda lst: lst[0]),
         'cdr': Builtin(lambda lst: lst[1:]),

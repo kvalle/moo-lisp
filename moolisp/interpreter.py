@@ -6,7 +6,7 @@ from evaluator import evaluate
 from parser import parse, unparse, parse_multiple
 from env import get_builtin_env
 
-def interpret(source, env):
+def interpret(source, env=None):
     """
     Interpret a moo lisp program statement
 

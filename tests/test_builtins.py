@@ -35,18 +35,12 @@ class TestBuiltins:
         assert_equals("#t", interpret('(<= 2 2)', self.env))
         assert_equals("#t", interpret('(<= 2 3)', self.env))
 
-    def test_list_nil(self):
-        """Test the predefined nil value"""
-
-        assert_equals(interpret("(quote ())", self.env), interpret("nil", self.env))
-        assert_equals("()", interpret("nil", self.env))
-
     def test_creating_lists(self):
         """Test different ways to create lists"""
 
         xs = "(1 2 #t 4)"
         assert_equals(xs, interpret("(quote (1 2 #t 4))", self.env))
-        assert_equals(xs, interpret("(cons 1 (cons 2 (cons #t (cons 4 nil))))", self.env))
+        assert_equals(xs, interpret("(cons 1 (cons 2 (cons #t (cons 4 '()))))", self.env))
         assert_equals(xs, interpret("(list 1 2 #t 4)", self.env))
 
     def test_deconstruction_of_lists(self):
