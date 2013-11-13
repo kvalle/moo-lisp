@@ -101,3 +101,15 @@ class TestMacros:
         
         assert_equals("(if #t 'bar 'foo)",
             interpret("(expand '(test #t))", env))  
+
+    def test_macro_call_expands_macro_then_evaluates_expression(self):
+        """A macro call should evaluate as a call to the expanded macro"""
+
+        env = Environment()
+        interpret("(define fooify (lambda (x) `(foo foo ,x foo)))", env)
+        interpret("""(define test 
+                        (macro (foo) 
+                            `(fooify ,foo)))""", env)
+
+        assert_equals("(foo foo bar foo)",
+            interpret("(test 'bar)", env))  

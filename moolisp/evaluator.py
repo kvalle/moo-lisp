@@ -135,6 +135,10 @@ def eval_let(ast, env):
 
 def apply(ast, env):
     cls = evaluate(ast[0], env)
+    
+    if is_macro(cls):
+        expanded_form = expand_once(ast, env)
+        return evaluate(expanded_form, env)
 
     args = [evaluate(exp, env) for exp in ast[1:]]
     if is_lambda(cls):
