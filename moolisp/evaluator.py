@@ -24,18 +24,43 @@ def evaluate(ast, env):
         elif ast[0] == 'atom': return eval_atom(ast, env)
         elif ast[0] == 'begin': return eval_begin(ast, env)
         elif ast[0] == 'define': return eval_define(ast, env)
-        else: return apply(ast, env)
+        else: 
+            fn = evaluate(ast[0], env)
+            if is_macro(fn): 
+                return apply_macro(ast, env)
+            elif is_lambda(fn): 
+                return apply_lambda(ast, env)
+            elif is_builtin(fn): 
+                return apply_builtin(ast, env)
+            else: 
+                raise LispTypeError("Call to: " + unparse(ast[0]))
     else:
         raise LispSyntaxError(ast)
+
+def apply_macro(ast, env):
+    expanded_form = expand_once(ast, env)
+    return evaluate(expanded_form, env)
+
+def apply_lambda(ast, env):
+    fn = evaluate(ast[0], env)
+    args = ast[1:]
+
+    if len(args) != len(fn.params):
+        msg = "Wrong number of arguments, expected %d got %d: %s" \
+            % (len(fn.params), len(args), unparse(ast))
+        raise LispTypeError(msg)
+    
+    args = [evaluate(exp, env) for exp in ast[1:]]
+    return evaluate(fn.body, Environment(zip(fn.params, args), env))
+
+def apply_builtin(ast, env):
+    fn = evaluate(ast[0], env)
+    args = [evaluate(exp, env) for exp in ast[1:]]
+    return fn.fn(*args)
 
 def eval_macro(ast, env):
     (_, params, body) = ast
     return Macro(params, body)
-
-def _is_macro_call(ast, env):
-    first = ast[0]
-    return is_macro(first) \
-        or is_macro(env.get(first, False))
 
 def expand_once(form, env):
     """expand macro form once
@@ -48,8 +73,12 @@ def expand_once(form, env):
     
     # expand
     substitutions = Environment(zip(macro.params, form[1:]), env)
-    expansion = evaluate(macro.body, substitutions)
-    return expansion
+    return evaluate(macro.body, substitutions)
+
+def _is_macro_call(ast, env):
+    first = ast[0]
+    return is_macro(first) \
+        or is_macro(env.get(first, False))
 
 def eval_expand_1(ast, env):
     form = evaluate(ast[1], env)
@@ -124,25 +153,6 @@ def eval_let(ast, env):
         _assert_valid_definition(d)
     defs = [(d[0], evaluate(d[1], env)) for d in ast[1]]
     return evaluate(ast[2], Environment(defs, env))
-
-def apply(ast, env):
-    cls = evaluate(ast[0], env)
-    
-    if is_macro(cls):
-        expanded_form = expand_once(ast, env)
-        return evaluate(expanded_form, env)
-
-    args = [evaluate(exp, env) for exp in ast[1:]]
-    if is_lambda(cls):
-        if len(args) != len(cls.params):
-            msg = "Wrong number of arguments, expected %d got %d: %s" \
-                % (len(cls.params), len(args), unparse(ast))
-            raise LispTypeError(msg)
-        return evaluate(cls.body, Environment(zip(cls.params, args), env))
-    elif is_builtin(cls):
-        return cls.fn(*args)
-    else:
-        raise LispTypeError("Call to non-function: " + unparse(ast))
 
 ## Syntax assertions
 
