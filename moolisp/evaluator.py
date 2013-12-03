@@ -12,7 +12,9 @@ def evaluate(ast, env):
     if is_symbol(ast): return env[ast]
     elif is_atom(ast): return ast
     elif is_list(ast):
-        if ast[0] == 'macro': return eval_macro(ast, env)
+        if ast[0] == 'atom': return eval_atom(ast, env)
+        elif ast[0] == 'eq': return eval_eq(ast, env)
+        elif ast[0] == 'macro': return eval_macro(ast, env)
         elif ast[0] == 'expand': return eval_expand(ast, env)
         elif ast[0] == 'expand-1': return eval_expand_1(ast, env)
         elif ast[0] == 'cond': return eval_cond(ast, env)
@@ -22,7 +24,6 @@ def evaluate(ast, env):
         elif ast[0] == 'quote': return eval_quote(ast, env)
         elif ast[0] == 'quasiquote': return eval_quasiquote(ast, env)
         elif ast[0] in ('lambda', 'λ'): return eval_lambda(ast, env)
-        elif ast[0] == 'atom': return eval_atom(ast, env)
         elif ast[0] == 'begin': return eval_begin(ast, env)
         elif ast[0] == 'define': return eval_define(ast, env)
         else: 
@@ -37,6 +38,11 @@ def evaluate(ast, env):
                 raise LispTypeError("Call to: " + unparse(ast[0]))
     else:
         raise LispSyntaxError(ast)
+
+def eval_eq(ast, env):
+    _assert_exp_length(ast, 3)
+    v1, v2 = evaluate(ast[1], env), evaluate(ast[2], env)
+    return boolean(True) if v1 == v2 and is_atom(v1) else boolean(False)
 
 def apply_macro(ast, env):
     expanded_form = expand_once(ast, env)

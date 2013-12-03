@@ -46,6 +46,28 @@ class TestEval:
         assert_equals(boolean(False), 
             evaluate(["atom", ["quote", ["foo", "bar"]]], env))
 
+    def test_eq_on_two_equal_atoms(self):
+        """Two of the same atom are equal"""
+
+        ast = ["eq", ["quote", "foo"], ["quote", "foo"]]
+        assert_equals(boolean(True), evaluate(ast, Environment()))
+
+    def test_eq_on_two_different_atoms(self):
+        """Two different atoms are not equal"""
+
+        ast = ["eq", ["quote", "foo"], ["quote", "bar"]]
+        assert_equals(boolean(False), evaluate(ast, Environment()))
+
+    def test_eq_on_non_atoms(self):
+        """Only atoms can equal with eq
+
+        Two lists are not equal (as measured by `eq`) even if they contains
+        the same elements."""
+
+        env = Environment()
+        ast = ["eq", ["quote", ["foo", "bar"]], ["quote", ["foo", "bar"]]]
+        assert_equals(boolean(False), evaluate(ast, env))
+
     def test_define(self):
         """Test simplest possible define"""
 
