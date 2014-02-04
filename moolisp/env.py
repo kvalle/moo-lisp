@@ -24,7 +24,8 @@ class Environment(dict):
 def get_builtin_env():
     """Returns an environment with the builtin functions defined.
 
-    You probably want to use moolisp.interpreter.default_env instead."""
+    You probably want to use moolisp.interpreter.default_env instead,
+    which is this extended with the Moo Lisp core functions."""
     return Environment({
         '+': Builtin(lambda x, y: integer(value_of(x) + value_of(y))),
         '-': Builtin(lambda x, y: integer(value_of(x) - value_of(y))),
@@ -40,6 +41,6 @@ def get_builtin_env():
 
         'cons': Builtin(lambda h, rest: [h] + rest),
         'car': Builtin(lambda lst: lst[0]),
-        'cdr': Builtin(lambda lst: lst[1:]),
-        'list': Builtin(lambda *args: list(args))
+        'cdr': Builtin(lambda lst: 'nil' if len(lst) == 1 else lst[1:]),
+        'list': Builtin(lambda *args: 'nil' if len(args) == 0 else list(args))
     })

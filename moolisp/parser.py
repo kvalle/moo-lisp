@@ -11,19 +11,6 @@ quote_names = {
 }
 quote_ticks = dict((tick, name) for name, tick in quote_names.iteritems())
 
-def unparse(ast):
-    if is_boolean(ast):
-        return "#t" if value_of(ast) else "#f"
-    elif is_integer(ast):
-        return str(value_of(ast))
-    elif isinstance(ast, list):
-        if len(ast) > 0 and ast[0] in quote_names:
-            return "%s%s" % (quote_names[ast[0]], unparse(ast[1]))
-        else:
-            return "(%s)" % " ".join([unparse(x) for x in ast])
-    else:
-        return str(ast)  # string, integer or Closure
-
 def parse(source):
     """Parse string representation of one single expression
     into the corresponding Abstract Syntax Tree"""
@@ -38,6 +25,19 @@ def parse(source):
         return [parse(e) for e in split_exps(exp[1:end])]
     else:
         return atomize(exp)
+
+def unparse(ast):
+    if is_boolean(ast):
+        return "#t" if value_of(ast) else "#f"
+    elif is_integer(ast):
+        return str(value_of(ast))
+    elif isinstance(ast, list):
+        if len(ast) > 0 and ast[0] in quote_names:
+            return "%s%s" % (quote_names[ast[0]], unparse(ast[1]))
+        else:
+            return "(%s)" % " ".join([unparse(x) for x in ast])
+    else:
+        return str(ast)  # string, integer or Closure
 
 def atomize(elem):
     if elem == "#f":

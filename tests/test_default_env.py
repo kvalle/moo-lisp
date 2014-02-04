@@ -13,6 +13,21 @@ class TestDefaultEnvironment:
         assert_equals(interpret("(quote ())"), interpret("nil"))
         assert_equals("()", interpret("nil"))
 
+    ## nil?
+
+    def IGNORED_test_check_nil_test_fn(self):
+        """Test the `nil?` function
+
+        `nil?` returns #t on empty lists, and #f otherwise"""
+
+        env = default_env()
+        assert_equals("#t", interpret("(nil? (list))"))
+        assert_equals("#t", interpret("(nil? 'nil)"))
+        assert_equals("#t", interpret("(nil? (cdr (list 1)))"))
+
+        assert_equals("#f", interpret("(nil? 'foo)"))
+        assert_equals("#f", interpret("(nil? (list 'foo 'bar))"))
+
     ## if macro
 
     def test_simple_if_statement(self):
