@@ -152,6 +152,7 @@ def eval_set(ast, env):
     _assert_exp_length(ast, 3)
     (_, var, exp) = ast
     env.defining_env(var)[var] = evaluate(exp, env)
+    return var
 
 def eval_let(ast, env):
     _assert_exp_length(ast, 3)
